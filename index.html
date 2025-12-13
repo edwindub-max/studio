@@ -104,13 +104,10 @@
       position: sticky;
       top: 0;
       z-index: 1030;
-      background: var(--bg-card);
+      background: linear-gradient(90deg, #ffffff 0%, #eef2ff 100%);
       border-bottom: 1px solid var(--border-color);
-      box-shadow: 0 8px 16px rgba(15, 23, 42, 0.06);
-      display: flex;
-      flex-direction: column;
-      transition: width 0.25s ease, box-shadow 0.25s ease, transform 0.3s ease;
-      overflow: hidden;
+      box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+      backdrop-filter: blur(10px);
     }
 
     .top-nav-inner {
@@ -118,116 +115,115 @@
       align-items: center;
       justify-content: space-between;
       gap: 1rem;
-      padding: 1rem 1.5rem;
-      padding: 0 1.5rem;
-      border-bottom: 1px solid var(--border-color);
-      transition: padding 0.25s ease;
-    }
-
-    .sidebar-logo {
-      height: 32px;
-      margin-right: 0.75rem;
+      padding: 0.85rem 1.75rem;
     }
 
     .brand {
       display: flex;
       align-items: center;
-      gap: 0.65rem;
+      gap: 0.85rem;
       font-weight: 700;
       color: var(--dark);
+    }
+
+    .brand-logo {
+      height: 44px;
+      width: 44px;
+      display: grid;
+      place-items: center;
+      border-radius: 14px;
+      background: rgba(79, 70, 229, 0.1);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 12px 30px rgba(79, 70, 229, 0.12);
+    }
+
+    .brand-logo img {
+      height: 26px;
+      width: 26px;
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+
+    .brand-title {
       font-size: 1.2rem;
+      letter-spacing: -0.01em;
     }
 
-    .brand img {
-      height: 32px;
-    .sidebar-footer {
-      padding: 1rem;
-      border-top: 1px solid var(--border-color);
-      transition: opacity 0.2s ease;
-    }
-
-    .sidebar-footer .search-bar {
-      position: relative;
-    }
-
-    .sidebar-footer .search-bar .search-icon {
-      position: absolute;
-      left: 0.75rem;
-      top: 50%;
-      transform: translateY(-50%);
+    .brand-subtitle {
+      font-size: 0.8rem;
       color: var(--text-muted);
-      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .top-nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
     }
 
     .nav-toggle {
       border: 1px solid var(--border-color);
-      border-radius: 0.75rem;
-      background: var(--bg-body);
-      width: 42px;
-      height: 42px;
-      display: flex;
+      border-radius: 0.9rem;
+      background: var(--bg-card);
+      width: 44px;
+      height: 44px;
+      display: inline-flex;
       align-items: center;
       justify-content: center;
       color: var(--dark);
+      box-shadow: var(--shadow-sm);
     }
 
     .top-nav-content {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 1.5rem;
-      padding: 0 1.5rem 1rem;
-      transition: max-height 0.3s ease, padding 0.3s ease;
-    .sidebar-nav {
-      padding: 1.5rem 1rem;
-      flex-grow: 1;
-      overflow-y: auto;
-      transition: padding 0.25s ease;
+      gap: 1.25rem;
+      padding: 0.75rem 1.75rem 1.35rem;
+      transition: max-height 0.35s ease, padding 0.3s ease;
     }
 
     .primary-nav {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.75rem;
       flex-wrap: wrap;
     }
 
     .nav-link {
       display: inline-flex;
       align-items: center;
-      gap: 0.5rem;
-      padding: 0.65rem 1rem;
-      padding: 0.85rem 1rem;
+      gap: 0.55rem;
+      padding: 0.8rem 1.05rem;
       color: var(--text-muted);
       font-weight: 600;
-      border-radius: var(--radius-md);
-      transition: all 0.2s ease;
-      cursor: pointer;
+      border-radius: 999px;
+      border: 1px solid var(--border-color);
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: 0 10px 18px rgba(15, 23, 42, 0.06);
       text-decoration: none;
-      white-space: nowrap;
-      background: transparent;
-      gap: 0.5rem;
       white-space: nowrap;
       opacity: 0;
       animation: fadeInNav 0.35s ease forwards;
       animation-delay: calc(var(--nav-index, 0) * 40ms);
-      gap: 0.75rem;
-      white-space: nowrap;
+      transition: all 0.2s ease;
     }
 
     .nav-link:hover {
-      background-color: var(--bg-body);
+      background: rgba(79, 70, 229, 0.08);
       color: var(--primary);
+      border-color: rgba(79, 70, 229, 0.3);
+      transform: translateY(-1px);
     }
 
     .nav-link.active {
-      background-color: var(--primary);
+      background: var(--primary);
       color: white;
-      box-shadow: var(--shadow-sm);
-    }
-
-    .nav-link i {
-      display: none;
+      border-color: var(--primary);
+      box-shadow: 0 12px 22px rgba(79, 70, 229, 0.22);
     }
 
     .nav-actions {
@@ -238,32 +234,45 @@
     }
 
     .nav-search {
-      width: min(320px, 32vw);
-      min-width: 200px;
+      width: min(360px, 38vw);
+      min-width: 220px;
     }
 
     .nav-user {
       display: flex;
       align-items: center;
       gap: 0.75rem;
+      padding: 0.35rem 0.65rem;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-color);
+      background: rgba(255, 255, 255, 0.92);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .logout-btn {
+      border-color: var(--border-color);
+      color: var(--text-muted);
+      background: var(--bg-card);
+      padding: 0.35rem 0.65rem;
+    }
+
+    .logout-btn:hover {
+      color: var(--primary);
+      border-color: rgba(79, 70, 229, 0.35);
     }
 
     .nav-user .avatar-circle {
-      width: 36px;
-      height: 36px;
-      margin-right: 0.75rem;
+      width: 40px;
+      height: 40px;
+      margin-right: 0;
       font-size: 1.1rem;
       flex-shrink: 0;
+      box-shadow: 0 8px 16px rgba(79, 70, 229, 0.18);
     }
 
     .nav-label {
       transition: opacity 0.2s ease, transform 0.2s ease;
       display: inline-block;
-    }
-
-    .sidebar-search,
-    .sidebar-meta {
-      transition: opacity 0.2s ease, transform 0.2s ease;
     }
 
     /* Main Content */
@@ -784,18 +793,22 @@
 
     /* Responsive */
     @media (max-width: 992px) {
+      .top-nav-inner {
+        padding: 0.75rem 1.25rem;
+      }
+
       .top-nav-content {
         flex-direction: column;
         align-items: stretch;
-        gap: 0.75rem;
+        gap: 1rem;
         max-height: 0;
-        padding: 0 1.5rem;
+        padding: 0 1.25rem;
         overflow: hidden;
       }
 
       .top-nav.is-open .top-nav-content {
-        max-height: 600px;
-        padding: 0 1.5rem 1rem;
+        max-height: 900px;
+        padding: 0.75rem 1.25rem 1.25rem;
       }
 
       .primary-nav {
@@ -811,38 +824,13 @@
       .nav-search {
         width: 100%;
         min-width: 0;
-      .sidebar {
-        transform: translateX(-100%);
-        width: var(--sidebar-width);
       }
 
-      #bulkActionsBar {
-        left: 50%;
-        transform: translateX(-50%) translateY(12px);
-        max-width: 96vw;
+      .nav-toggle {
+        display: inline-flex;
       }
 
-      #bulkActionsBar .bulk-actions-inner {
-        justify-content: center;
-      .sidebar.is-collapsed,
-      .sidebar.is-collapsed:hover {
-        width: var(--sidebar-width);
-      }
-
-      .sidebar.is-collapsed .sidebar-brand,
-      .sidebar.is-collapsed .sidebar-search,
-      .sidebar.is-collapsed .sidebar-meta,
-      .sidebar.is-collapsed .sidebar-footer .user-details,
-      .sidebar.is-collapsed .sidebar-footer .text-center,
-      .sidebar.is-collapsed .nav-label {
-        opacity: 1;
-        transform: translateX(0);
-        pointer-events: auto;
-      }
-
-      .main-content,
-      .sidebar.is-collapsed ~ .main-content,
-      .sidebar.is-collapsed:hover ~ .main-content {
+      .main-content {
         margin-left: 0;
       }
 
@@ -881,107 +869,63 @@
     <header class="top-nav">
       <div class="top-nav-inner">
         <div class="brand">
-          <img src="/favicon.svg" alt="Logo">
-          <span>PhotoTracker</span>
-    <aside class="sidebar is-collapsed">
-      <div class="sidebar-header justify-content-between">
-        <div class="d-flex align-items-center gap-2">
-          <img src="/favicon.svg" alt="Logo" class="sidebar-logo">
-          <h5 class="sidebar-brand mb-0">PhotoTracker</h5>
-        </div>
-        <button class="nav-toggle d-lg-none" onclick="toggleNav()" aria-label="Menu">
-          <i class="bi bi-list"></i>
-        </button>
-        <div class="nav-user d-none d-lg-flex">
-      </div>
-      <div class="px-3 mb-3 sidebar-search">
-        <div class="input-group">
-          <span class="input-group-text bg-light border-end-0 text-muted" style="padding: 0.75rem 0 0.75rem 1rem;"><i
-              class="bi bi-search"></i></span>
-          <input id="search" type="text" class="form-control bg-light border-start-0 ps-2" placeholder="Rechercher..."
-            onkeyup="handleSearch()" style="padding: 0.75rem 1rem 0.75rem 0;">
-        </div>
-      </div>
-      <nav class="sidebar-nav">
-        <a id="btnShooter" class="nav-link tab-btn active" onclick="showShooter()" style="--nav-index: 0;">
-          <span class="nav-label">À shooter</span>
-        </a>
-        <a id="btnOk" class="nav-link tab-btn" onclick="showOk()" style="--nav-index: 1;">
-          <span class="nav-label">Photo OK</span>
-        </a>
-        <a id="btnByRequester" class="nav-link tab-btn" onclick="showByRequester()" style="--nav-index: 2;">
-          <span class="nav-label">Par Demandeur</span>
-        </a>
-        <a id="btnAddList" class="nav-link tab-btn d-none" onclick="showAddList()" style="--nav-index: 3;">
-          <span class="nav-label">Ajouter liste</span>
-        </a>
-        <a id="btnUpdateList" class="nav-link tab-btn d-none" onclick="showUpdateList()" style="--nav-index: 4;">
-          <span class="nav-label">Import Reshoot</span>
-        </a>
-        <a id="btnAdmin" class="nav-link tab-btn d-none" onclick="showAdmin()" style="--nav-index: 5;">
-          <span class="nav-label">Admin</span>
-        <a id="btnShooter" class="nav-link tab-btn active" onclick="showShooter()">
-          <i class="bi bi-camera"></i> <span class="nav-label">À shooter</span>
-        </a>
-        <a id="btnOk" class="nav-link tab-btn" onclick="showOk()">
-          <i class="bi bi-check-circle"></i> <span class="nav-label">Photo OK</span>
-        </a>
-        <a id="btnByRequester" class="nav-link tab-btn" onclick="showByRequester()">
-          <i class="bi bi-people"></i> <span class="nav-label">Par Demandeur</span>
-        </a>
-        <a id="btnAddList" class="nav-link tab-btn d-none" onclick="showAddList()">
-          <i class="bi bi-plus-circle"></i> <span class="nav-label">Ajouter liste</span>
-        </a>
-        <a id="btnUpdateList" class="nav-link tab-btn d-none" onclick="showUpdateList()">
-          <i class="bi bi-arrow-repeat"></i> <span class="nav-label">Import Reshoot</span>
-        </a>
-        <a id="btnAdmin" class="nav-link tab-btn d-none" onclick="showAdmin()">
-          <i class="bi bi-gear"></i> <span class="nav-label">Admin</span>
-        </a>
-      </nav>
-      <div class="sidebar-footer">
-
-        <div class="d-flex align-items-center gap-2">
-          <div class="avatar-circle bg-primary text-white">
-            <span id="userInitials">U</span>
+          <div class="brand-logo">
+            <img src="/favicon.svg" alt="Logo PhotoTracker">
           </div>
-          <div class="flex-grow-1 overflow-hidden user-details">
-            <div id="userName" class="fw-bold text-truncate" style="font-size: 0.9rem;">Utilisateur</div>
-            <div id="userRole" class="text-muted small text-truncate" style="font-size: 0.75rem;">Rôle</div>
+          <div class="brand-text">
+            <span class="brand-title">PhotoTracker</span>
+            <span class="brand-subtitle">Studio</span>
           </div>
-          <button class="btn btn-link text-muted p-0" onclick="logout()" title="Déconnexion">
-            <i class="bi bi-box-arrow-right"></i>
+        </div>
+        <div class="top-nav-actions">
+          <div class="nav-user d-none d-lg-flex">
+            <div class="avatar-circle bg-primary text-white">
+              <span id="userInitials">U</span>
+            </div>
+            <div class="user-details">
+              <div id="userName" class="fw-bold text-truncate" style="font-size: 0.9rem;">Utilisateur</div>
+              <div id="userRole" class="text-muted small text-truncate" style="font-size: 0.75rem;">Rôle</div>
+            </div>
+            <button class="btn btn-outline-secondary logout-btn d-none d-lg-inline-flex" onclick="logout()" title="Déconnexion">
+              <i class="bi bi-box-arrow-right"></i>
+            </button>
+          </div>
+          <button class="nav-toggle d-lg-none" onclick="toggleNav()" aria-label="Menu">
+            <i class="bi bi-list"></i>
           </button>
         </div>
-        <div class="text-center mt-2 text-muted sidebar-meta" style="font-size: 0.65rem;">v2.2 - Dubarry Edwin</div>
       </div>
       <div class="top-nav-content">
         <nav class="primary-nav">
           <a id="btnShooter" class="nav-link tab-btn active" onclick="showShooter()" style="--nav-index: 0;">
+            <i class="bi bi-camera"></i>
             <span class="nav-label">À shooter</span>
           </a>
           <a id="btnOk" class="nav-link tab-btn" onclick="showOk()" style="--nav-index: 1;">
+            <i class="bi bi-check-circle"></i>
             <span class="nav-label">Photo OK</span>
           </a>
           <a id="btnByRequester" class="nav-link tab-btn" onclick="showByRequester()" style="--nav-index: 2;">
+            <i class="bi bi-people"></i>
             <span class="nav-label">Par Demandeur</span>
           </a>
           <a id="btnAddList" class="nav-link tab-btn d-none" onclick="showAddList()" style="--nav-index: 3;">
+            <i class="bi bi-plus-circle"></i>
             <span class="nav-label">Ajouter liste</span>
           </a>
           <a id="btnUpdateList" class="nav-link tab-btn d-none" onclick="showUpdateList()" style="--nav-index: 4;">
+            <i class="bi bi-arrow-repeat"></i>
             <span class="nav-label">Import Reshoot</span>
           </a>
           <a id="btnAdmin" class="nav-link tab-btn d-none" onclick="showAdmin()" style="--nav-index: 5;">
+            <i class="bi bi-gear"></i>
             <span class="nav-label">Admin</span>
           </a>
         </nav>
         <div class="nav-actions">
           <div class="input-group nav-search">
-            <span class="input-group-text bg-light border-end-0 text-muted" style="padding: 0.75rem 0 0.75rem 1rem;"><i
-                class="bi bi-search"></i></span>
-            <input id="search" type="text" class="form-control bg-light border-start-0 ps-2" placeholder="Rechercher..."
-              onkeyup="handleSearch()" style="padding: 0.75rem 1rem 0.75rem 0;">
+            <span class="input-group-text bg-light border-end-0 text-muted" style="padding: 0.75rem 0 0.75rem 1rem;"><i class="bi bi-search"></i></span>
+            <input id="search" type="text" class="form-control bg-light border-start-0 ps-2" placeholder="Rechercher..." onkeyup="handleSearch()" style="padding: 0.75rem 1rem 0.75rem 0;">
           </div>
           <div class="nav-user d-flex d-lg-none">
             <div class="avatar-circle bg-primary text-white">
