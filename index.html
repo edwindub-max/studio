@@ -107,6 +107,10 @@
       background: var(--bg-card);
       border-bottom: 1px solid var(--border-color);
       box-shadow: 0 8px 16px rgba(15, 23, 42, 0.06);
+      display: flex;
+      flex-direction: column;
+      transition: width 0.25s ease, box-shadow 0.25s ease, transform 0.3s ease;
+      overflow: hidden;
     }
 
     .top-nav-inner {
@@ -115,6 +119,14 @@
       justify-content: space-between;
       gap: 1rem;
       padding: 1rem 1.5rem;
+      padding: 0 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+      transition: padding 0.25s ease;
+    }
+
+    .sidebar-logo {
+      height: 32px;
+      margin-right: 0.75rem;
     }
 
     .brand {
@@ -128,6 +140,23 @@
 
     .brand img {
       height: 32px;
+    .sidebar-footer {
+      padding: 1rem;
+      border-top: 1px solid var(--border-color);
+      transition: opacity 0.2s ease;
+    }
+
+    .sidebar-footer .search-bar {
+      position: relative;
+    }
+
+    .sidebar-footer .search-bar .search-icon {
+      position: absolute;
+      left: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 0.9rem;
     }
 
     .nav-toggle {
@@ -149,6 +178,11 @@
       gap: 1.5rem;
       padding: 0 1.5rem 1rem;
       transition: max-height 0.3s ease, padding 0.3s ease;
+    .sidebar-nav {
+      padding: 1.5rem 1rem;
+      flex-grow: 1;
+      overflow-y: auto;
+      transition: padding 0.25s ease;
     }
 
     .primary-nav {
@@ -163,6 +197,7 @@
       align-items: center;
       gap: 0.5rem;
       padding: 0.65rem 1rem;
+      padding: 0.85rem 1rem;
       color: var(--text-muted);
       font-weight: 600;
       border-radius: var(--radius-md);
@@ -171,6 +206,13 @@
       text-decoration: none;
       white-space: nowrap;
       background: transparent;
+      gap: 0.5rem;
+      white-space: nowrap;
+      opacity: 0;
+      animation: fadeInNav 0.35s ease forwards;
+      animation-delay: calc(var(--nav-index, 0) * 40ms);
+      gap: 0.75rem;
+      white-space: nowrap;
     }
 
     .nav-link:hover {
@@ -209,6 +251,19 @@
     .nav-user .avatar-circle {
       width: 36px;
       height: 36px;
+      margin-right: 0.75rem;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+
+    .nav-label {
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      display: inline-block;
+    }
+
+    .sidebar-search,
+    .sidebar-meta {
+      transition: opacity 0.2s ease, transform 0.2s ease;
     }
 
     /* Main Content */
@@ -221,6 +276,7 @@
       overflow-y: auto;
       overflow-x: hidden;
       padding-top: 0.5rem;
+      transition: margin-left 0.25s ease;
     }
 
 
@@ -516,6 +572,20 @@
       font-size: 0.95rem;
     }
 
+    }
+
+    #bulkActionsBar .bulk-count {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(79, 70, 229, 0.1);
+      color: var(--primary);
+      border-radius: 999px;
+      padding: 0.45rem 0.85rem;
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
     #bulkActionsBar .bulk-actions-group {
       display: flex;
       flex-wrap: wrap;
@@ -631,6 +701,87 @@
       flex-shrink: 0;
     }
 
+    /* Sidebar nav reveal */
+    @keyframes fadeInNav {
+      from {
+        opacity: 0;
+        transform: translateX(-6px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    /* Collapsible Sidebar (desktop) */
+    .sidebar.is-collapsed {
+      width: var(--sidebar-collapsed-width);
+      box-shadow: var(--shadow-md);
+    }
+
+    .sidebar.is-collapsed .sidebar-header,
+    .sidebar.is-collapsed .sidebar-nav {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+
+    .sidebar.is-collapsed .sidebar-brand,
+    .sidebar.is-collapsed .sidebar-search,
+    .sidebar.is-collapsed .sidebar-meta,
+    .sidebar.is-collapsed .sidebar-footer .user-details,
+    .sidebar.is-collapsed .sidebar-footer .text-center {
+      opacity: 0;
+      transform: translateX(-8px);
+      pointer-events: none;
+    }
+
+    .sidebar.is-collapsed .sidebar-logo {
+      margin-right: 0;
+      height: 28px;
+    }
+
+    .sidebar.is-collapsed .nav-link {
+      justify-content: center;
+      padding: 0.85rem 0.65rem;
+    }
+
+    .sidebar.is-collapsed .nav-link i {
+      margin-right: 0;
+      font-size: 1.15rem;
+    }
+
+    .sidebar.is-collapsed .nav-label {
+      opacity: 0;
+      transform: translateX(-6px);
+      pointer-events: none;
+    }
+
+    .sidebar.is-collapsed:hover {
+      width: var(--sidebar-width);
+    }
+
+    .sidebar.is-collapsed:hover .sidebar-brand,
+    .sidebar.is-collapsed:hover .sidebar-search,
+    .sidebar.is-collapsed:hover .sidebar-meta,
+    .sidebar.is-collapsed:hover .sidebar-footer .user-details,
+    .sidebar.is-collapsed:hover .sidebar-footer .text-center,
+    .sidebar.is-collapsed:hover .nav-label {
+      opacity: 1;
+      transform: translateX(0);
+      pointer-events: auto;
+    }
+
+    .sidebar.is-collapsed:hover .nav-link {
+      justify-content: flex-start;
+    }
+
+    .sidebar.is-collapsed ~ .main-content {
+      margin-left: var(--sidebar-collapsed-width);
+    }
+
+    .sidebar.is-collapsed:hover ~ .main-content {
+      margin-left: var(--sidebar-width);
+    }
+
     /* Responsive */
     @media (max-width: 992px) {
       .top-nav-content {
@@ -660,6 +811,39 @@
       .nav-search {
         width: 100%;
         min-width: 0;
+      .sidebar {
+        transform: translateX(-100%);
+        width: var(--sidebar-width);
+      }
+
+      #bulkActionsBar {
+        left: 50%;
+        transform: translateX(-50%) translateY(12px);
+        max-width: 96vw;
+      }
+
+      #bulkActionsBar .bulk-actions-inner {
+        justify-content: center;
+      .sidebar.is-collapsed,
+      .sidebar.is-collapsed:hover {
+        width: var(--sidebar-width);
+      }
+
+      .sidebar.is-collapsed .sidebar-brand,
+      .sidebar.is-collapsed .sidebar-search,
+      .sidebar.is-collapsed .sidebar-meta,
+      .sidebar.is-collapsed .sidebar-footer .user-details,
+      .sidebar.is-collapsed .sidebar-footer .text-center,
+      .sidebar.is-collapsed .nav-label {
+        opacity: 1;
+        transform: translateX(0);
+        pointer-events: auto;
+      }
+
+      .main-content,
+      .sidebar.is-collapsed ~ .main-content,
+      .sidebar.is-collapsed:hover ~ .main-content {
+        margin-left: 0;
       }
 
       #bulkActionsBar {
@@ -699,11 +883,65 @@
         <div class="brand">
           <img src="/favicon.svg" alt="Logo">
           <span>PhotoTracker</span>
+    <aside class="sidebar is-collapsed">
+      <div class="sidebar-header justify-content-between">
+        <div class="d-flex align-items-center gap-2">
+          <img src="/favicon.svg" alt="Logo" class="sidebar-logo">
+          <h5 class="sidebar-brand mb-0">PhotoTracker</h5>
         </div>
         <button class="nav-toggle d-lg-none" onclick="toggleNav()" aria-label="Menu">
           <i class="bi bi-list"></i>
         </button>
         <div class="nav-user d-none d-lg-flex">
+      </div>
+      <div class="px-3 mb-3 sidebar-search">
+        <div class="input-group">
+          <span class="input-group-text bg-light border-end-0 text-muted" style="padding: 0.75rem 0 0.75rem 1rem;"><i
+              class="bi bi-search"></i></span>
+          <input id="search" type="text" class="form-control bg-light border-start-0 ps-2" placeholder="Rechercher..."
+            onkeyup="handleSearch()" style="padding: 0.75rem 1rem 0.75rem 0;">
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <a id="btnShooter" class="nav-link tab-btn active" onclick="showShooter()" style="--nav-index: 0;">
+          <span class="nav-label">À shooter</span>
+        </a>
+        <a id="btnOk" class="nav-link tab-btn" onclick="showOk()" style="--nav-index: 1;">
+          <span class="nav-label">Photo OK</span>
+        </a>
+        <a id="btnByRequester" class="nav-link tab-btn" onclick="showByRequester()" style="--nav-index: 2;">
+          <span class="nav-label">Par Demandeur</span>
+        </a>
+        <a id="btnAddList" class="nav-link tab-btn d-none" onclick="showAddList()" style="--nav-index: 3;">
+          <span class="nav-label">Ajouter liste</span>
+        </a>
+        <a id="btnUpdateList" class="nav-link tab-btn d-none" onclick="showUpdateList()" style="--nav-index: 4;">
+          <span class="nav-label">Import Reshoot</span>
+        </a>
+        <a id="btnAdmin" class="nav-link tab-btn d-none" onclick="showAdmin()" style="--nav-index: 5;">
+          <span class="nav-label">Admin</span>
+        <a id="btnShooter" class="nav-link tab-btn active" onclick="showShooter()">
+          <i class="bi bi-camera"></i> <span class="nav-label">À shooter</span>
+        </a>
+        <a id="btnOk" class="nav-link tab-btn" onclick="showOk()">
+          <i class="bi bi-check-circle"></i> <span class="nav-label">Photo OK</span>
+        </a>
+        <a id="btnByRequester" class="nav-link tab-btn" onclick="showByRequester()">
+          <i class="bi bi-people"></i> <span class="nav-label">Par Demandeur</span>
+        </a>
+        <a id="btnAddList" class="nav-link tab-btn d-none" onclick="showAddList()">
+          <i class="bi bi-plus-circle"></i> <span class="nav-label">Ajouter liste</span>
+        </a>
+        <a id="btnUpdateList" class="nav-link tab-btn d-none" onclick="showUpdateList()">
+          <i class="bi bi-arrow-repeat"></i> <span class="nav-label">Import Reshoot</span>
+        </a>
+        <a id="btnAdmin" class="nav-link tab-btn d-none" onclick="showAdmin()">
+          <i class="bi bi-gear"></i> <span class="nav-label">Admin</span>
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+
+        <div class="d-flex align-items-center gap-2">
           <div class="avatar-circle bg-primary text-white">
             <span id="userInitials">U</span>
           </div>
@@ -715,6 +953,7 @@
             <i class="bi bi-box-arrow-right"></i>
           </button>
         </div>
+        <div class="text-center mt-2 text-muted sidebar-meta" style="font-size: 0.65rem;">v2.2 - Dubarry Edwin</div>
       </div>
       <div class="top-nav-content">
         <nav class="primary-nav">
