@@ -32,6 +32,7 @@
       --text-main: #1e293b;
       --text-muted: #64748b;
       --sidebar-width: 260px;
+      --sidebar-collapsed-width: 76px;
       --header-height: 70px;
       --radius-md: 0.75rem;
       --radius-lg: 1rem;
@@ -94,111 +95,82 @@
     /* App Layout */
     .app-layout {
       display: flex;
+      flex-direction: column;
       min-height: 100vh;
     }
 
-    /* Sidebar */
-    .sidebar {
-      width: var(--sidebar-width);
-      background: var(--bg-card);
-      border-right: 1px solid var(--border-color);
-      position: fixed;
+    /* Top Navigation */
+    .top-nav {
+      position: sticky;
       top: 0;
-      bottom: 0;
-      left: 0;
       z-index: 1030;
-      display: flex;
-      flex-direction: column;
-      transition: transform 0.3s ease;
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border-color);
+      box-shadow: 0 8px 16px rgba(15, 23, 42, 0.06);
     }
 
-    .sidebar-header {
-      height: var(--header-height);
+    .top-nav-inner {
       display: flex;
       align-items: center;
-      padding: 0 1.5rem;
-      border-bottom: 1px solid var(--border-color);
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 1rem 1.5rem;
     }
 
-    .sidebar-logo {
-      height: 32px;
-      margin-right: 0.75rem;
-    }
-
-    .sidebar-brand {
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
       font-weight: 700;
-      font-size: 1.25rem;
       color: var(--dark);
-      margin: 0;
+      font-size: 1.2rem;
     }
 
-    .sidebar-header {
-      padding: 1.5rem;
-      border-bottom: 1px solid var(--border-color);
+    .brand img {
+      height: 32px;
     }
 
-    .sidebar-footer {
-      padding: 1rem;
-      border-top: 1px solid var(--border-color);
-    }
-
-    .sidebar-footer .search-bar {
-      position: relative;
-    }
-
-    .sidebar-footer .search-bar .search-icon {
-      position: absolute;
-      left: 0.75rem;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--text-muted);
-      font-size: 0.9rem;
-    }
-
-    .sidebar-footer .search-bar input {
-      padding-left: 2.5rem;
-      border-radius: var(--radius-md);
+    .nav-toggle {
       border: 1px solid var(--border-color);
-    }
-
-    .sidebar-footer .user-avatar {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: var(--primary);
-      color: white;
+      border-radius: 0.75rem;
+      background: var(--bg-body);
+      width: 42px;
+      height: 42px;
       display: flex;
       align-items: center;
       justify-content: center;
-      cursor: pointer;
-      transition: all 0.2s;
+      color: var(--dark);
     }
 
-    .sidebar-footer .user-avatar:hover {
-      background: var(--primary-dark);
-      transform: scale(1.05);
+    .top-nav-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem;
+      padding: 0 1.5rem 1rem;
+      transition: max-height 0.3s ease, padding 0.3s ease;
     }
 
-    .sidebar-nav {
-      padding: 1.5rem 1rem;
-      flex-grow: 1;
-      overflow-y: auto;
-    }
-
-    .nav-item {
-      margin-bottom: 0.5rem;
+    .primary-nav {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
     }
 
     .nav-link {
-      display: flex;
+      display: inline-flex;
       align-items: center;
-      padding: 0.75rem 1rem;
+      gap: 0.5rem;
+      padding: 0.65rem 1rem;
       color: var(--text-muted);
-      font-weight: 500;
+      font-weight: 600;
       border-radius: var(--radius-md);
-      transition: all 0.2s;
+      transition: all 0.2s ease;
       cursor: pointer;
       text-decoration: none;
+      white-space: nowrap;
+      background: transparent;
     }
 
     .nav-link:hover {
@@ -213,20 +185,42 @@
     }
 
     .nav-link i {
-      margin-right: 0.75rem;
-      font-size: 1.1rem;
+      display: none;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .nav-search {
+      width: min(320px, 32vw);
+      min-width: 200px;
+    }
+
+    .nav-user {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .nav-user .avatar-circle {
+      width: 36px;
+      height: 36px;
     }
 
     /* Main Content */
     .main-content {
       flex-grow: 1;
-      margin-left: var(--sidebar-width);
       display: flex;
       flex-direction: column;
       min-height: 100vh;
       max-height: 100vh;
       overflow-y: auto;
       overflow-x: hidden;
+      padding-top: 0.5rem;
     }
 
 
@@ -266,7 +260,10 @@
     .table-responsive {
       padding: 0.5rem 0.5rem 1.5rem 0.5rem;
       position: relative;
-      overflow: visible;
+      overflow-x: auto;
+      overflow-y: visible;
+      -webkit-overflow-scrolling: touch;
+      scroll-behavior: smooth;
     }
 
     .table {
@@ -325,6 +322,52 @@
     .table tbody tr td:last-child {
       border-top-right-radius: var(--radius-md);
       border-bottom-right-radius: var(--radius-md);
+    }
+
+    .table-responsive.has-scroll::before,
+    .table-responsive.has-scroll::after {
+      content: "";
+      position: sticky;
+      top: 0;
+      width: 32px;
+      height: 100%;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+      z-index: 10;
+    }
+
+    .table-responsive.has-scroll::before {
+      left: 0;
+      background: linear-gradient(90deg, var(--bg-card), rgba(255, 255, 255, 0));
+      opacity: 0;
+    }
+
+    .table-responsive.has-scroll::after {
+      right: 0;
+      background: linear-gradient(270deg, var(--bg-card), rgba(255, 255, 255, 0));
+      opacity: 0;
+    }
+
+    .table-responsive.has-scroll:not(.is-at-start)::before { opacity: 0.9; }
+    .table-responsive.has-scroll:not(.is-at-end)::after { opacity: 0.9; }
+
+    @media (max-width: 768px) {
+      .table-responsive {
+        margin: 0 -1rem;
+        padding: 0 1rem 1.25rem;
+        overflow-x: auto;
+      }
+
+      .table {
+        min-width: 640px;
+        font-size: 0.9rem;
+      }
+
+      .table thead th,
+      .table tbody td {
+        padding: 0.9rem 1rem;
+        white-space: nowrap;
+      }
     }
 
     /* Checkbox column adjustment */
@@ -431,31 +474,62 @@
     /* Bulk Actions Bar */
     #bulkActionsBar {
       position: fixed;
-      bottom: 2rem;
+      bottom: 1.75rem;
       left: 50%;
-      transform: translateX(-50%);
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(0, 0, 0, 0.08);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-      border-radius: 16px;
-      padding: 1rem 1.5rem;
+      transform: translateX(-50%) translateY(12px);
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(0, 0, 0, 0.07);
+      box-shadow: 0 18px 36px rgba(0, 0, 0, 0.12);
+      border-radius: 18px;
+      padding: 0.85rem 1.25rem;
       z-index: 1040;
-      max-width: 90%;
+      max-width: min(1100px, 92vw);
       width: auto;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease, transform 0.25s ease;
     }
 
-    #bulkActionsBar .container-fluid {
-      padding: 0;
+    #bulkActionsBar.is-visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    #bulkActionsBar .bulk-actions-inner {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    #bulkActionsBar .bulk-count {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(79, 70, 229, 0.1);
+      color: var(--primary);
+      border-radius: 999px;
+      padding: 0.45rem 0.85rem;
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    #bulkActionsBar .bulk-actions-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
     }
 
     #bulkActionsBar .btn {
       border-radius: var(--radius-md);
       width: auto;
       height: auto;
-      padding: 0.5rem 1rem;
+      padding: 0.5rem 0.9rem;
       flex-direction: row;
-      gap: 0.5rem;
+      gap: 0.4rem;
+      box-shadow: 0 6px 20px rgba(79, 70, 229, 0.08);
     }
 
     #bulkActionsBar .btn i {
@@ -559,16 +633,43 @@
 
     /* Responsive */
     @media (max-width: 992px) {
-      .sidebar {
-        transform: translateX(-100%);
+      .top-nav-content {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+        max-height: 0;
+        padding: 0 1.5rem;
+        overflow: hidden;
       }
 
-      .sidebar.show {
-        transform: translateX(0);
+      .top-nav.is-open .top-nav-content {
+        max-height: 600px;
+        padding: 0 1.5rem 1rem;
       }
 
-      .main-content {
-        margin-left: 0;
+      .primary-nav {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .nav-actions {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .nav-search {
+        width: 100%;
+        min-width: 0;
+      }
+
+      #bulkActionsBar {
+        left: 50%;
+        transform: translateX(-50%) translateY(12px);
+        max-width: 96vw;
+      }
+
+      #bulkActionsBar .bulk-actions-inner {
+        justify-content: center;
       }
     }
   </style>
@@ -593,51 +694,20 @@
   </div>
 
   <div id="appBox" class="app-layout d-none">
-    <aside class="sidebar">
-      <div class="sidebar-header justify-content-between">
-        <div class="d-flex align-items-center gap-2">
-          <img src="/favicon.svg" alt="Logo" class="sidebar-logo">
-          <h5 class="sidebar-brand mb-0">PhotoTracker</h5>
+    <header class="top-nav">
+      <div class="top-nav-inner">
+        <div class="brand">
+          <img src="/favicon.svg" alt="Logo">
+          <span>PhotoTracker</span>
         </div>
-        <button class="btn btn-link text-muted d-lg-none p-0" onclick="toggleSidebar()">
-          <i class="bi bi-x-lg"></i>
+        <button class="nav-toggle d-lg-none" onclick="toggleNav()" aria-label="Menu">
+          <i class="bi bi-list"></i>
         </button>
-      </div>
-      <div class="px-3 mb-3">
-        <div class="input-group">
-          <span class="input-group-text bg-light border-end-0 text-muted" style="padding: 0.75rem 0 0.75rem 1rem;"><i
-              class="bi bi-search"></i></span>
-          <input id="search" type="text" class="form-control bg-light border-start-0 ps-2" placeholder="Rechercher..."
-            onkeyup="handleSearch()" style="padding: 0.75rem 1rem 0.75rem 0;">
-        </div>
-      </div>
-      <nav class="sidebar-nav">
-        <a id="btnShooter" class="nav-link tab-btn active" onclick="showShooter()">
-          <i class="bi bi-camera"></i> À shooter
-        </a>
-        <a id="btnOk" class="nav-link tab-btn" onclick="showOk()">
-          <i class="bi bi-check-circle"></i> Photo OK
-        </a>
-        <a id="btnByRequester" class="nav-link tab-btn" onclick="showByRequester()">
-          <i class="bi bi-people"></i> Par Demandeur
-        </a>
-        <a id="btnAddList" class="nav-link tab-btn d-none" onclick="showAddList()">
-          <i class="bi bi-plus-circle"></i> Ajouter liste
-        </a>
-        <a id="btnUpdateList" class="nav-link tab-btn d-none" onclick="showUpdateList()">
-          <i class="bi bi-arrow-repeat"></i> Import Reshoot
-        </a>
-        <a id="btnAdmin" class="nav-link tab-btn d-none" onclick="showAdmin()">
-          <i class="bi bi-gear"></i> Admin
-        </a>
-      </nav>
-      <div class="sidebar-footer">
-
-        <div class="d-flex align-items-center gap-2">
+        <div class="nav-user d-none d-lg-flex">
           <div class="avatar-circle bg-primary text-white">
             <span id="userInitials">U</span>
           </div>
-          <div class="flex-grow-1 overflow-hidden">
+          <div class="flex-grow-1 overflow-hidden user-details">
             <div id="userName" class="fw-bold text-truncate" style="font-size: 0.9rem;">Utilisateur</div>
             <div id="userRole" class="text-muted small text-truncate" style="font-size: 0.75rem;">Rôle</div>
           </div>
@@ -645,24 +715,54 @@
             <i class="bi bi-box-arrow-right"></i>
           </button>
         </div>
-        <div class="text-center mt-2 text-muted" style="font-size: 0.65rem;">v2.2 - Dubarry Edwin</div>
       </div>
-    </aside>
+      <div class="top-nav-content">
+        <nav class="primary-nav">
+          <a id="btnShooter" class="nav-link tab-btn active" onclick="showShooter()" style="--nav-index: 0;">
+            <span class="nav-label">À shooter</span>
+          </a>
+          <a id="btnOk" class="nav-link tab-btn" onclick="showOk()" style="--nav-index: 1;">
+            <span class="nav-label">Photo OK</span>
+          </a>
+          <a id="btnByRequester" class="nav-link tab-btn" onclick="showByRequester()" style="--nav-index: 2;">
+            <span class="nav-label">Par Demandeur</span>
+          </a>
+          <a id="btnAddList" class="nav-link tab-btn d-none" onclick="showAddList()" style="--nav-index: 3;">
+            <span class="nav-label">Ajouter liste</span>
+          </a>
+          <a id="btnUpdateList" class="nav-link tab-btn d-none" onclick="showUpdateList()" style="--nav-index: 4;">
+            <span class="nav-label">Import Reshoot</span>
+          </a>
+          <a id="btnAdmin" class="nav-link tab-btn d-none" onclick="showAdmin()" style="--nav-index: 5;">
+            <span class="nav-label">Admin</span>
+          </a>
+        </nav>
+        <div class="nav-actions">
+          <div class="input-group nav-search">
+            <span class="input-group-text bg-light border-end-0 text-muted" style="padding: 0.75rem 0 0.75rem 1rem;"><i
+                class="bi bi-search"></i></span>
+            <input id="search" type="text" class="form-control bg-light border-start-0 ps-2" placeholder="Rechercher..."
+              onkeyup="handleSearch()" style="padding: 0.75rem 1rem 0.75rem 0;">
+          </div>
+          <div class="nav-user d-flex d-lg-none">
+            <div class="avatar-circle bg-primary text-white">
+              <span id="userInitialsMobile">U</span>
+            </div>
+            <div class="flex-grow-1 overflow-hidden user-details">
+              <div id="userNameMobile" class="fw-bold text-truncate" style="font-size: 0.9rem;">Utilisateur</div>
+              <div id="userRoleMobile" class="text-muted small text-truncate" style="font-size: 0.75rem;">Rôle</div>
+            </div>
+            <button class="btn btn-link text-muted p-0" onclick="logout()" title="Déconnexion">
+              <i class="bi bi-box-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
 
     <main class="main-content">
       <div id="main-spinner" class="position-fixed top-0 end-0 m-3 spinner-border spinner-border-sm text-primary d-none"
         role="status" style="z-index: 9999;"></div>
-
-      <!-- Mobile Header -->
-      <div class="d-lg-none p-3 border-bottom bg-white d-flex align-items-center justify-content-between">
-        <div class="d-flex align-items-center gap-2">
-          <img src="/favicon.svg" alt="Logo" style="height: 24px;">
-          <span class="fw-bold">PhotoTracker</span>
-        </div>
-        <button class="btn btn-link text-dark p-0" onclick="toggleSidebar()">
-          <i class="bi bi-list fs-4"></i>
-        </button>
-      </div>
 
       <div class="content-wrapper">
         <!-- Panels -->
@@ -1256,9 +1356,9 @@
   </div>
 
   <div id="bulkActionsBar" class="d-none">
-    <div class="container-fluid d-flex align-items-center">
-      <span id="selCount" class="me-3 fw-bold text-primary">0 sélectionné(s)</span>
-      <div class="btn-group">
+    <div class="bulk-actions-inner">
+      <span class="bulk-count"><i class="bi bi-check2-square"></i><span id="selCount">0 sélectionné(s)</span></span>
+      <div class="bulk-actions-group btn-group">
         <button class="btn btn-sm btn-outline-primary" onclick="openBulkModal('change_status')"
           title="Changer le statut"><i class="bi bi-tag-fill"></i><span>Statut</span></button>
         <button class="btn btn-sm btn-outline-primary" onclick="openBulkModal('change_demandeur')"
@@ -1274,7 +1374,7 @@
         <button class="btn btn-sm btn-outline-danger" onclick="openBulkModal('delete')" title="Supprimer"><i
             class="bi bi-trash-fill"></i><span>Supprimer</span></button>
       </div>
-      <button type="button" class="btn-close ms-3" title="Désélectionner tout" onclick="deselectAll()"></button>
+      <button type="button" class="btn-close ms-auto" title="Désélectionner tout" onclick="deselectAll()"></button>
     </div>
   </div>
 
@@ -1745,6 +1845,34 @@
       function showSpinner() { if (spinner) spinner.classList.remove('d-none'); }
       function hideSpinner() { if (spinner) spinner.classList.add('d-none'); }
 
+      // Indicateurs visuels pour le défilement horizontal des tableaux
+      const tableScrollContainers = new Set();
+      function updateTableScrollState(container) {
+        if (!(container instanceof HTMLElement)) return;
+        const maxScrollLeft = container.scrollWidth - container.clientWidth;
+        const hasScroll = maxScrollLeft > 1;
+        container.classList.toggle('has-scroll', hasScroll);
+        if (!hasScroll) return;
+        const atStart = container.scrollLeft <= 1;
+        const atEnd = container.scrollLeft >= maxScrollLeft - 1;
+        container.classList.toggle('is-at-start', atStart);
+        container.classList.toggle('is-at-end', atEnd);
+      }
+
+      function bindTableScroll(container) {
+        if (!(container instanceof HTMLElement) || tableScrollContainers.has(container)) return;
+        tableScrollContainers.add(container);
+        container.addEventListener('scroll', () => updateTableScrollState(container), { passive: true });
+        updateTableScrollState(container);
+      }
+
+      function setupTableScrollHints(root = document) {
+        root.querySelectorAll('.table-responsive').forEach(bindTableScroll);
+        tableScrollContainers.forEach(updateTableScrollState);
+      }
+
+      window.addEventListener('resize', () => tableScrollContainers.forEach(updateTableScrollState));
+
       async function fetchJSON(url, options = {}) {
         const opts = Object.assign({ credentials: 'include' }, options);
         const res = await fetch(url, opts);
@@ -1831,6 +1959,18 @@
           }
         });
 
+        setupTableScrollHints();
+        const tableObserver = new MutationObserver((mutations) => {
+          for (const mutation of mutations) {
+            mutation.addedNodes.forEach((node) => {
+              if (!(node instanceof HTMLElement)) return;
+              if (node.classList.contains('table-responsive')) bindTableScroll(node);
+              node.querySelectorAll?.('.table-responsive').forEach(bindTableScroll);
+            });
+          }
+        });
+        tableObserver.observe(document.body, { childList: true, subtree: true });
+
         showSpinner();
         try {
           const js = await fetchJSON('api/current_user.php');
@@ -1880,12 +2020,25 @@
           if (el) el.classList.toggle('d-none', shouldBeHidden);
         };
 
-        document.getElementById('userName').textContent = currentUser.identifiant;
-        document.getElementById('userRole').textContent = currentUser.role.charAt(0).toUpperCase() + currentUser.role.slice(1);
+        const nameValue = currentUser.identifiant;
+        const roleValue = currentUser.role.charAt(0).toUpperCase() + currentUser.role.slice(1);
+
+        ['userName', 'userNameMobile'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.textContent = nameValue;
+        });
+
+        ['userRole', 'userRoleMobile'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.textContent = roleValue;
+        });
 
         // Avatar Logic
         const initials = currentUser.identifiant.substring(0, 2).toUpperCase();
-        document.getElementById('userInitials').textContent = initials;
+        ['userInitials', 'userInitialsMobile'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.textContent = initials;
+        });
 
         // Generate color from name
         let hash = 0;
@@ -1895,11 +2048,10 @@
         const c = (hash & 0x00FFFFFF).toString(16).toUpperCase();
         const color = '#' + '00000'.substring(0, 6 - c.length) + c;
 
-        const avatarEl = document.querySelector('.avatar-circle');
-        if (avatarEl) {
+        document.querySelectorAll('.avatar-circle').forEach(avatarEl => {
           avatarEl.style.backgroundColor = color;
           avatarEl.classList.remove('bg-primary');
-        }
+        });
 
         safeToggle('user-menu', false);
 
@@ -1945,7 +2097,7 @@
           // I didn't add a Reader link in the HTML. I should have.
           // I will add it via JS for now to avoid rewriting Part 1.
 
-          const nav = document.querySelector('.sidebar-nav');
+          const nav = document.querySelector('.primary-nav');
           if (!document.getElementById('btnReader')) {
             const btn = document.createElement('a');
             btn.id = 'btnReader';
@@ -1989,6 +2141,20 @@
           document.body.classList.add('role-photographe');
         }
       }
+
+      document.querySelectorAll('.primary-nav .nav-link').forEach(link => {
+        link.addEventListener('click', () => {
+          if (window.innerWidth < 992) {
+            document.querySelector('.top-nav')?.classList.remove('is-open');
+          }
+        });
+      });
+
+      window.addEventListener('resize', () => {
+        if (window.innerWidth >= 992) {
+          document.querySelector('.top-nav')?.classList.remove('is-open');
+        }
+      });
 
 
       // --- GESTION DE L'APPLICATION ---
@@ -2867,15 +3033,19 @@
       function updateActionsBar() {
         const cnt = selectedIds.size;
         const bar = document.getElementById('bulkActionsBar');
-        const selCountEl = document.getElementById('selCount'); // <-- LIGNE AJOUTÉE
+        const selCountEl = document.getElementById('selCount');
+
         if (cnt > 0) {
-          bar.classList.add('d-none', false); // Remove d-none
-          bar.classList.add('is-visible'); // Keep custom class if needed
+          selCountEl.textContent = `${cnt} sélectionné(s)`;
           bar.classList.remove('d-none');
-          selCountEl.textContent = `${cnt} sélectionné(s)`; // <-- LIGNE AJOUTÉE
+          requestAnimationFrame(() => bar.classList.add('is-visible'));
         } else {
-          bar.classList.add('d-none');
           bar.classList.remove('is-visible');
+          setTimeout(() => {
+            if (selectedIds.size === 0) {
+              bar.classList.add('d-none');
+            }
+          }, 220);
         }
       }
 
@@ -3723,9 +3893,9 @@
           }
         });
       }
-      // --- RESPONSIVE SIDEBAR ---
-      function toggleSidebar() {
-        document.querySelector('.sidebar').classList.toggle('show');
+      // --- RESPONSIVE NAVIGATION ---
+      function toggleNav() {
+        document.querySelector('.top-nav')?.classList.toggle('is-open');
       }
     </script>
 </body>
