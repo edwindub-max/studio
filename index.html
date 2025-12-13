@@ -197,13 +197,18 @@
     .nav-link {
       display: flex;
       align-items: center;
-      padding: 0.75rem 1rem;
+      padding: 0.85rem 1rem;
       color: var(--text-muted);
-      font-weight: 500;
+      font-weight: 600;
       border-radius: var(--radius-md);
       transition: all 0.2s;
       cursor: pointer;
       text-decoration: none;
+      gap: 0.5rem;
+      white-space: nowrap;
+      opacity: 0;
+      animation: fadeInNav 0.35s ease forwards;
+      animation-delay: calc(var(--nav-index, 0) * 40ms);
       gap: 0.75rem;
       white-space: nowrap;
     }
@@ -220,6 +225,7 @@
     }
 
     .nav-link i {
+      display: none;
       margin-right: 0.75rem;
       font-size: 1.1rem;
       flex-shrink: 0;
@@ -656,6 +662,17 @@
       flex-shrink: 0;
     }
 
+    /* Sidebar nav reveal */
+    @keyframes fadeInNav {
+      from {
+        opacity: 0;
+        transform: translateX(-6px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
     /* Collapsible Sidebar (desktop) */
     .sidebar.is-collapsed {
       width: var(--sidebar-collapsed-width);
@@ -810,6 +827,23 @@
         </div>
       </div>
       <nav class="sidebar-nav">
+        <a id="btnShooter" class="nav-link tab-btn active" onclick="showShooter()" style="--nav-index: 0;">
+          <span class="nav-label">À shooter</span>
+        </a>
+        <a id="btnOk" class="nav-link tab-btn" onclick="showOk()" style="--nav-index: 1;">
+          <span class="nav-label">Photo OK</span>
+        </a>
+        <a id="btnByRequester" class="nav-link tab-btn" onclick="showByRequester()" style="--nav-index: 2;">
+          <span class="nav-label">Par Demandeur</span>
+        </a>
+        <a id="btnAddList" class="nav-link tab-btn d-none" onclick="showAddList()" style="--nav-index: 3;">
+          <span class="nav-label">Ajouter liste</span>
+        </a>
+        <a id="btnUpdateList" class="nav-link tab-btn d-none" onclick="showUpdateList()" style="--nav-index: 4;">
+          <span class="nav-label">Import Reshoot</span>
+        </a>
+        <a id="btnAdmin" class="nav-link tab-btn d-none" onclick="showAdmin()" style="--nav-index: 5;">
+          <span class="nav-label">Admin</span>
         <a id="btnShooter" class="nav-link tab-btn active" onclick="showShooter()">
           <i class="bi bi-camera"></i> <span class="nav-label">À shooter</span>
         </a>
