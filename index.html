@@ -108,31 +108,17 @@
       border-bottom: 1px solid var(--border-color);
       box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
       backdrop-filter: blur(10px);
-      transition: transform 0.3s ease, opacity 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    .top-nav.nav-hidden {
-      transform: translateY(calc(-100% + 12px));
-      opacity: 0.9;
-      box-shadow: 0 6px 16px rgba(15, 23, 42, 0.06);
-    }
-
-    .nav-hover-zone {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 14px;
-      z-index: 1029;
-      background: transparent;
     }
 
     .top-nav-inner {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 0.75rem;
+      gap: 1rem;
       padding: 0.65rem 1.4rem;
+      position: relative;
+      min-height: var(--header-height);
+      flex-wrap: wrap;
     }
 
     .brand {
@@ -185,8 +171,8 @@
       border: 1px solid var(--border-color);
       border-radius: 0.85rem;
       background: var(--bg-card);
-      width: 40px;
-      height: 40px;
+      width: 44px;
+      height: 44px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -195,12 +181,29 @@
     }
 
     .top-nav-content {
+      position: absolute;
+      right: 1.4rem;
+      top: calc(100% + 12px);
       display: flex;
-      align-items: center;
-      justify-content: space-between;
+      flex-direction: column;
+      align-items: stretch;
       gap: 1rem;
-      padding: 0.55rem 1.4rem 1rem;
-      transition: max-height 0.35s ease, padding 0.3s ease;
+      padding: 1rem;
+      width: min(420px, calc(100vw - 2.8rem));
+      background: rgba(255, 255, 255, 0.98);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 14px 34px rgba(15, 23, 42, 0.14);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(-6px);
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+
+    .top-nav.is-open .top-nav-content {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
     }
 
     .primary-nav {
@@ -252,7 +255,8 @@
 
     .nav-search {
       width: min(320px, 36vw);
-      min-width: 200px;
+      min-width: 220px;
+      flex: 1 1 260px;
     }
 
     .nav-user {
@@ -303,6 +307,7 @@
       overflow-x: hidden;
       padding-top: 0.5rem;
       transition: margin-left 0.25s ease;
+      scroll-padding-top: calc(var(--header-height) + 8px);
     }
 
 
@@ -810,25 +815,27 @@
 
     /* Responsive */
     @media (max-width: 992px) {
-      .top-nav.nav-hidden {
-        transform: none;
-        opacity: 1;
-      }
-
       .top-nav-inner {
         padding: 0.75rem 1.25rem;
       }
 
       .top-nav-content {
-        flex-direction: column;
-        align-items: stretch;
+        position: static;
+        width: 100%;
+        box-shadow: none;
+        border: none;
+        opacity: 1;
+        pointer-events: none;
+        transform: none;
         gap: 1rem;
         max-height: 0;
         padding: 0 1.25rem;
         overflow: hidden;
+        background: transparent;
       }
 
       .top-nav.is-open .top-nav-content {
+        pointer-events: auto;
         max-height: 900px;
         padding: 0.75rem 1.25rem 1.25rem;
       }
@@ -900,25 +907,45 @@
             <span class="brand-subtitle">Studio</span>
           </div>
         </div>
-        <div class="top-nav-actions">
-          <div class="nav-user d-none d-lg-flex">
-            <div class="avatar-circle bg-primary text-white">
-              <span id="userInitials">U</span>
+        <div class="d-flex align-items-center gap-3 flex-wrap justify-content-end flex-grow-1">
+          <div class="input-group nav-search">
+            <span class="input-group-text bg-light border-end-0 text-muted" style="padding: 0.75rem 0 0.75rem 1rem;"><i class="bi bi-search"></i></span>
+            <input id="search" type="text" class="form-control bg-light border-start-0 ps-2" placeholder="Rechercher..." onkeyup="handleSearch()" style="padding: 0.75rem 1rem 0.75rem 0;">
+          </div>
+          <div class="top-nav-actions">
+            <div class="nav-user d-none d-lg-flex">
+              <div class="avatar-circle bg-primary text-white">
+                <span id="userInitials">U</span>
+              </div>
+              <div class="user-details">
+                <div id="userName" class="fw-bold text-truncate" style="font-size: 0.9rem;">Utilisateur</div>
+                <div id="userRole" class="text-muted small text-truncate" style="font-size: 0.75rem;">Rôle</div>
+              </div>
+              <button class="btn btn-outline-secondary logout-btn d-none d-lg-inline-flex" onclick="logout()" title="Déconnexion">
+                <i class="bi bi-box-arrow-right"></i>
+              </button>
             </div>
-            <div class="user-details">
-              <div id="userName" class="fw-bold text-truncate" style="font-size: 0.9rem;">Utilisateur</div>
-              <div id="userRole" class="text-muted small text-truncate" style="font-size: 0.75rem;">Rôle</div>
-            </div>
-            <button class="btn btn-outline-secondary logout-btn d-none d-lg-inline-flex" onclick="logout()" title="Déconnexion">
-              <i class="bi bi-box-arrow-right"></i>
+            <button class="nav-toggle" onclick="toggleNav()" aria-label="Menu">
+              <i class="bi bi-list"></i>
             </button>
           </div>
-          <button class="nav-toggle d-lg-none" onclick="toggleNav()" aria-label="Menu">
-            <i class="bi bi-list"></i>
-          </button>
         </div>
       </div>
       <div class="top-nav-content">
+        <div class="nav-actions d-md-none">
+          <div class="nav-user d-flex w-100">
+            <div class="avatar-circle bg-primary text-white">
+              <span id="userInitialsMobile">U</span>
+            </div>
+            <div class="flex-grow-1 overflow-hidden user-details">
+              <div id="userNameMobile" class="fw-bold text-truncate" style="font-size: 0.9rem;">Utilisateur</div>
+              <div id="userRoleMobile" class="text-muted small text-truncate" style="font-size: 0.75rem;">Rôle</div>
+            </div>
+            <button class="btn btn-link text-muted p-0" onclick="logout()" title="Déconnexion">
+              <i class="bi bi-box-arrow-right"></i>
+            </button>
+          </div>
+        </div>
         <nav class="primary-nav">
           <a id="btnShooter" class="nav-link tab-btn active" onclick="showShooter()" style="--nav-index: 0;">
             <i class="bi bi-camera"></i>
@@ -945,24 +972,6 @@
             <span class="nav-label">Admin</span>
           </a>
         </nav>
-        <div class="nav-actions">
-          <div class="input-group nav-search">
-            <span class="input-group-text bg-light border-end-0 text-muted" style="padding: 0.75rem 0 0.75rem 1rem;"><i class="bi bi-search"></i></span>
-            <input id="search" type="text" class="form-control bg-light border-start-0 ps-2" placeholder="Rechercher..." onkeyup="handleSearch()" style="padding: 0.75rem 1rem 0.75rem 0;">
-          </div>
-          <div class="nav-user d-flex d-lg-none">
-            <div class="avatar-circle bg-primary text-white">
-              <span id="userInitialsMobile">U</span>
-            </div>
-            <div class="flex-grow-1 overflow-hidden user-details">
-              <div id="userNameMobile" class="fw-bold text-truncate" style="font-size: 0.9rem;">Utilisateur</div>
-              <div id="userRoleMobile" class="text-muted small text-truncate" style="font-size: 0.75rem;">Rôle</div>
-            </div>
-            <button class="btn btn-link text-muted p-0" onclick="logout()" title="Déconnexion">
-              <i class="bi bi-box-arrow-right"></i>
-            </button>
-          </div>
-        </div>
       </div>
     </header>
 
@@ -2350,47 +2359,20 @@
 
       document.querySelectorAll('.primary-nav .nav-link').forEach(link => {
         link.addEventListener('click', () => {
-          if (window.innerWidth < 992) {
-            document.querySelector('.top-nav')?.classList.remove('is-open');
-          }
+          document.querySelector('.top-nav')?.classList.remove('is-open');
         });
       });
 
       const topNav = document.querySelector('.top-nav');
-      const navHoverZone = document.querySelector('.nav-hover-zone');
-      let navHideTimeout;
-
-      function showTopNav() {
-        if (!topNav) return;
-        clearTimeout(navHideTimeout);
-        topNav.classList.remove('nav-hidden');
-      }
-
-      function hideTopNav() {
-        if (!topNav || window.innerWidth < 992) return;
-        topNav.classList.add('nav-hidden');
-      }
-
-      function queueHideTopNav(delay = 280) {
-        clearTimeout(navHideTimeout);
-        navHideTimeout = setTimeout(hideTopNav, delay);
-      }
-
-      [topNav, navHoverZone].forEach(el => {
-        el?.addEventListener('mouseenter', showTopNav);
-        el?.addEventListener('focusin', showTopNav);
-      });
-
-      topNav?.addEventListener('mouseleave', () => queueHideTopNav());
-      navHoverZone?.addEventListener('mouseleave', () => queueHideTopNav());
-
       window.addEventListener('resize', () => {
         if (window.innerWidth >= 992) {
           topNav?.classList.remove('is-open');
-          queueHideTopNav(0);
-        } else {
-          clearTimeout(navHideTimeout);
-          topNav?.classList.remove('nav-hidden');
+        }
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!topNav?.contains(e.target)) {
+          topNav?.classList.remove('is-open');
         }
       });
 
