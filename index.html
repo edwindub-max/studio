@@ -266,7 +266,10 @@
     .table-responsive {
       padding: 0.5rem 0.5rem 1.5rem 0.5rem;
       position: relative;
-      overflow: visible;
+      overflow-x: auto;
+      overflow-y: visible;
+      -webkit-overflow-scrolling: touch;
+      scroll-behavior: smooth;
     }
 
     .table {
@@ -325,6 +328,52 @@
     .table tbody tr td:last-child {
       border-top-right-radius: var(--radius-md);
       border-bottom-right-radius: var(--radius-md);
+    }
+
+    .table-responsive.has-scroll::before,
+    .table-responsive.has-scroll::after {
+      content: "";
+      position: sticky;
+      top: 0;
+      width: 32px;
+      height: 100%;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+      z-index: 10;
+    }
+
+    .table-responsive.has-scroll::before {
+      left: 0;
+      background: linear-gradient(90deg, var(--bg-card), rgba(255, 255, 255, 0));
+      opacity: 0;
+    }
+
+    .table-responsive.has-scroll::after {
+      right: 0;
+      background: linear-gradient(270deg, var(--bg-card), rgba(255, 255, 255, 0));
+      opacity: 0;
+    }
+
+    .table-responsive.has-scroll:not(.is-at-start)::before { opacity: 0.9; }
+    .table-responsive.has-scroll:not(.is-at-end)::after { opacity: 0.9; }
+
+    @media (max-width: 768px) {
+      .table-responsive {
+        margin: 0 -1rem;
+        padding: 0 1rem 1.25rem;
+        overflow-x: auto;
+      }
+
+      .table {
+        min-width: 640px;
+        font-size: 0.9rem;
+      }
+
+      .table thead th,
+      .table tbody td {
+        padding: 0.9rem 1rem;
+        white-space: nowrap;
+      }
     }
 
     /* Checkbox column adjustment */
@@ -1745,6 +1794,34 @@
       function showSpinner() { if (spinner) spinner.classList.remove('d-none'); }
       function hideSpinner() { if (spinner) spinner.classList.add('d-none'); }
 
+      // Indicateurs visuels pour le défilement horizontal des tableaux
+      const tableScrollContainers = new Set();
+      function updateTableScrollState(container) {
+        if (!(container instanceof HTMLElement)) return;
+        const maxScrollLeft = container.scrollWidth - container.clientWidth;
+        const hasScroll = maxScrollLeft > 1;
+        container.classList.toggle('has-scroll', hasScroll);
+        if (!hasScroll) return;
+        const atStart = container.scrollLeft <= 1;
+        const atEnd = container.scrollLeft >= maxScrollLeft - 1;
+        container.classList.toggle('is-at-start', atStart);
+        container.classList.toggle('is-at-end', atEnd);
+      }
+
+      function bindTableScroll(container) {
+        if (!(container instanceof HTMLElement) || tableScrollContainers.has(container)) return;
+        tableScrollContainers.add(container);
+        container.addEventListener('scroll', () => updateTableScrollState(container), { passive: true });
+        updateTableScrollState(container);
+      }
+
+      function setupTableScrollHints(root = document) {
+        root.querySelectorAll('.table-responsive').forEach(bindTableScroll);
+        tableScrollContainers.forEach(updateTableScrollState);
+      }
+
+      window.addEventListener('resize', () => tableScrollContainers.forEach(updateTableScrollState));
+
       async function fetchJSON(url, options = {}) {
         const opts = Object.assign({ credentials: 'include' }, options);
         const res = await fetch(url, opts);
@@ -1830,6 +1907,18 @@
             document.querySelectorAll('.filter-menu.is-visible').forEach(m => m.classList.remove('is-visible'));
           }
         });
+
+        setupTableScrollHints();
+        const tableObserver = new MutationObserver((mutations) => {
+          for (const mutation of mutations) {
+            mutation.addedNodes.forEach((node) => {
+              if (!(node instanceof HTMLElement)) return;
+              if (node.classList.contains('table-responsive')) bindTableScroll(node);
+              node.querySelectorAll?.('.table-responsive').forEach(bindTableScroll);
+            });
+          }
+        });
+        tableObserver.observe(document.body, { childList: true, subtree: true });
 
         showSpinner();
         try {
