@@ -1,0 +1,3733 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PhotoTracker</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script
+    src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+      --secondary: #64748b;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --info: #3b82f6;
+      --dark: #0f172a;
+      --light: #f8fafc;
+      --bg-body: #f1f5f9;
+      --bg-card: #ffffff;
+      --border-color: #e2e8f0;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --sidebar-width: 260px;
+      --header-height: 70px;
+      --radius-md: 0.75rem;
+      --radius-lg: 1rem;
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      --glass-bg: rgba(255, 255, 255, 0.8);
+      --glass-border: rgba(255, 255, 255, 0.5);
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-body);
+      color: var(--text-main);
+      overflow-x: hidden;
+      padding-bottom: 0;
+      /* Reset */
+    }
+
+    /* Login Styles */
+    body.login-active {
+      overflow: hidden;
+    }
+
+    body.login-active .app-layout {
+      display: none;
+    }
+
+    .login-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #f6f8fb 0%, #e2e8f0 100%);
+    }
+
+    .login-form-wrapper {
+      width: 100%;
+      max-width: 400px;
+      padding: 3rem;
+      background: var(--glass-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+      text-align: center;
+    }
+
+    .login-logo {
+      max-width: 120px;
+      margin-bottom: 1.5rem;
+    }
+
+    .login-title {
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 2rem;
+      font-size: 1.75rem;
+    }
+
+    /* App Layout */
+    .app-layout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: var(--sidebar-width);
+      background: var(--bg-card);
+      border-right: 1px solid var(--border-color);
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 1030;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.3s ease;
+    }
+
+    .sidebar-header {
+      height: var(--header-height);
+      display: flex;
+      align-items: center;
+      padding: 0 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .sidebar-logo {
+      height: 32px;
+      margin-right: 0.75rem;
+    }
+
+    .sidebar-brand {
+      font-weight: 700;
+      font-size: 1.25rem;
+      color: var(--dark);
+      margin: 0;
+    }
+
+    .sidebar-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .sidebar-footer {
+      padding: 1rem;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .sidebar-footer .search-bar {
+      position: relative;
+    }
+
+    .sidebar-footer .search-bar .search-icon {
+      position: absolute;
+      left: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    .sidebar-footer .search-bar input {
+      padding-left: 2.5rem;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-color);
+    }
+
+    .sidebar-footer .user-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .sidebar-footer .user-avatar:hover {
+      background: var(--primary-dark);
+      transform: scale(1.05);
+    }
+
+    .sidebar-nav {
+      padding: 1.5rem 1rem;
+      flex-grow: 1;
+      overflow-y: auto;
+    }
+
+    .nav-item {
+      margin-bottom: 0.5rem;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      color: var(--text-muted);
+      font-weight: 500;
+      border-radius: var(--radius-md);
+      transition: all 0.2s;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .nav-link:hover {
+      background-color: var(--bg-body);
+      color: var(--primary);
+    }
+
+    .nav-link.active {
+      background-color: var(--primary);
+      color: white;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .nav-link i {
+      margin-right: 0.75rem;
+      font-size: 1.1rem;
+    }
+
+    /* Main Content */
+    .main-content {
+      flex-grow: 1;
+      margin-left: var(--sidebar-width);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      max-height: 100vh;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+
+
+    /* Content Area */
+    .content-wrapper {
+      padding: 2rem;
+      flex: 1;
+      overflow: visible;
+    }
+
+    /* Cards */
+    .card {
+      border: none;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      background: var(--bg-card);
+      margin-bottom: 1.5rem;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .card:hover {
+      box-shadow: var(--shadow-md);
+    }
+
+    .card-header {
+      background: transparent;
+      border-bottom: 1px solid var(--border-color);
+      padding: 1.25rem 1.5rem;
+      font-weight: 600;
+    }
+
+    .card-body {
+      padding: 1.5rem;
+    }
+
+    /* Tables Modernization */
+    .table-responsive {
+      padding: 0.5rem 0.5rem 1.5rem 0.5rem;
+      position: relative;
+      overflow: visible;
+    }
+
+    .table {
+      border-collapse: separate;
+      border-spacing: 0 0.75rem;
+      /* Vertical spacing between rows */
+      margin-bottom: 0;
+    }
+
+    .table thead th {
+      position: sticky;
+      top: 0;
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(8px);
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      vertical-align: middle;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .table tbody tr {
+      background: white;
+      box-shadow: var(--shadow-sm);
+      border-radius: var(--radius-md);
+      transition: all 0.2s ease;
+    }
+
+    .table tbody tr:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+      background-color: white;
+      /* Ensure it stays white or use a very subtle tint */
+      z-index: 1;
+      position: relative;
+    }
+
+    .table tbody td {
+      padding: 1.25rem 1.5rem;
+      vertical-align: middle;
+      border: none;
+      background: transparent;
+    }
+
+    /* Rounded corners for the row-card */
+    .table tbody tr td:first-child {
+      border-top-left-radius: var(--radius-md);
+      border-bottom-left-radius: var(--radius-md);
+    }
+
+    .table tbody tr td:last-child {
+      border-top-right-radius: var(--radius-md);
+      border-bottom-right-radius: var(--radius-md);
+    }
+
+    /* Checkbox column adjustment */
+    .table tbody td:first-child input[type="checkbox"] {
+      width: 1.1em;
+      height: 1.1em;
+      cursor: pointer;
+    }
+
+    /* Contextual Row Styles */
+    .table tbody tr.table-danger {
+      background-color: #fee2e2;
+    }
+
+    .table tbody tr.table-warning {
+      background-color: #fffbeb;
+    }
+
+    .table tbody tr.table-success {
+      background-color: #dcfce7;
+    }
+
+    .table tbody tr.table-info {
+      background-color: #e0f2fe;
+    }
+
+    /* Badges */
+    .badge {
+      padding: 0.5em 0.8em;
+      border-radius: 2rem;
+      font-weight: 500;
+    }
+
+    .badge-status {
+      font-size: 0.85rem;
+    }
+
+    .badge-recu {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .badge-a-venir {
+      background: #fef9c3;
+      color: #854d0e;
+    }
+
+    .badge-pas-recu {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .badge-a-mettre-dam {
+      background: #e0e7ff;
+      color: #3730a3;
+    }
+
+    .badge-manquant {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .badge-relance {
+      background: #e0f2fe;
+      color: #075985;
+    }
+
+    .badge-deja-shoote {
+      background: #f1f5f9;
+      color: #475569;
+    }
+
+    .badge-reshoote {
+      background: #94a3b8;
+      color: white;
+      text-decoration: line-through;
+    }
+
+    .badge-retour-relance {
+      background: #c084fc;
+      color: #581c87;
+    }
+
+    /* KPI Cards */
+    .kpi-card {
+      text-align: center;
+      padding: 1.5rem;
+    }
+
+    .kpi-card .card-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .kpi-card .card-text {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* Bulk Actions Bar */
+    #bulkActionsBar {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+      border-radius: 16px;
+      padding: 1rem 1.5rem;
+      z-index: 1040;
+      max-width: 90%;
+      width: auto;
+    }
+
+    #bulkActionsBar .container-fluid {
+      padding: 0;
+    }
+
+    #bulkActionsBar .btn {
+      border-radius: var(--radius-md);
+      width: auto;
+      height: auto;
+      padding: 0.5rem 1rem;
+      flex-direction: row;
+      gap: 0.5rem;
+    }
+
+    #bulkActionsBar .btn i {
+      font-size: 1.1rem;
+    }
+
+    #bulkActionsBar .btn span {
+      font-size: 0.85rem;
+      display: inline;
+    }
+
+    /* Utilities */
+    .text-purple {
+      color: #8b5cf6;
+    }
+
+    .bg-purple {
+      background-color: #8b5cf6;
+      color: white;
+    }
+
+    .ls-1 {
+      letter-spacing: 0.05em;
+    }
+
+    .filter-icon {
+      color: var(--text-muted);
+      transition: color 0.2s;
+    }
+
+    .filter-icon:hover,
+    .filter-icon.active-filter {
+      color: var(--primary);
+    }
+
+    /* Sparkle */
+    .sparkle {
+      position: absolute;
+      z-index: 9999;
+      pointer-events: none;
+      border-radius: 50%;
+      animation: sparkle-animation 0.8s forwards;
+    }
+
+    @keyframes sparkle-animation {
+      0% {
+        opacity: 1;
+        transform: scale(1) rotate(0deg);
+      }
+
+      100% {
+        opacity: 0;
+        transform: scale(0) rotate(180deg);
+      }
+    }
+
+    /* Filter Menus - Floating Popovers */
+    .filter-menu {
+      position: fixed;
+      background: white;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      padding: 0.75rem;
+      min-width: 200px;
+      max-width: 300px;
+      max-height: 300px;
+      overflow-y: auto;
+      z-index: 1050;
+      display: none;
+    }
+
+    .filter-menu.is-visible {
+      display: block;
+    }
+
+    .filter-menu .form-check {
+      padding: 0.25rem 0;
+    }
+
+    .filter-menu .form-check-label {
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+
+    .filter-menu .form-check-input {
+      cursor: pointer;
+    }
+
+    .avatar-circle {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+
+      .sidebar.show {
+        transform: translateX(0);
+      }
+
+      .main-content {
+        margin-left: 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="loginBox" class="login-container">
+    <div class="login-form-wrapper">
+      <img src="/favicon.svg" alt="Logo Gifi" class="login-logo">
+      <h2 class="login-title">PhotoTracker</h2>
+      <div class="mb-3">
+        <label class="form-label visually-hidden">Identifiant</label>
+        <input id="loginIdent" class="form-control" placeholder="Identifiant">
+      </div>
+      <div class="mb-3">
+        <label class="form-label visually-hidden">Mot de passe</label>
+        <input id="loginPass" type="password" class="form-control" placeholder="Mot de passe">
+      </div>
+      <button class="btn btn-primary w-100" onclick="login()">Se connecter</button>
+      <div id="loginErr" class="text-danger small mt-2"></div>
+    </div>
+  </div>
+
+  <div id="appBox" class="app-layout d-none">
+    <aside class="sidebar">
+      <div class="sidebar-header justify-content-between">
+        <div class="d-flex align-items-center gap-2">
+          <img src="/favicon.svg" alt="Logo" class="sidebar-logo">
+          <h5 class="sidebar-brand mb-0">PhotoTracker</h5>
+        </div>
+        <button class="btn btn-link text-muted d-lg-none p-0" onclick="toggleSidebar()">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+      <div class="px-3 mb-3">
+        <div class="input-group">
+          <span class="input-group-text bg-light border-end-0 text-muted" style="padding: 0.75rem 0 0.75rem 1rem;"><i
+              class="bi bi-search"></i></span>
+          <input id="search" type="text" class="form-control bg-light border-start-0 ps-2" placeholder="Rechercher..."
+            onkeyup="handleSearch()" style="padding: 0.75rem 1rem 0.75rem 0;">
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <a id="btnShooter" class="nav-link tab-btn active" onclick="showShooter()">
+          <i class="bi bi-camera"></i> À shooter
+        </a>
+        <a id="btnOk" class="nav-link tab-btn" onclick="showOk()">
+          <i class="bi bi-check-circle"></i> Photo OK
+        </a>
+        <a id="btnByRequester" class="nav-link tab-btn" onclick="showByRequester()">
+          <i class="bi bi-people"></i> Par Demandeur
+        </a>
+        <a id="btnAddList" class="nav-link tab-btn d-none" onclick="showAddList()">
+          <i class="bi bi-plus-circle"></i> Ajouter liste
+        </a>
+        <a id="btnUpdateList" class="nav-link tab-btn d-none" onclick="showUpdateList()">
+          <i class="bi bi-arrow-repeat"></i> Import Reshoot
+        </a>
+        <a id="btnAdmin" class="nav-link tab-btn d-none" onclick="showAdmin()">
+          <i class="bi bi-gear"></i> Admin
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+
+        <div class="d-flex align-items-center gap-2">
+          <div class="avatar-circle bg-primary text-white">
+            <span id="userInitials">U</span>
+          </div>
+          <div class="flex-grow-1 overflow-hidden">
+            <div id="userName" class="fw-bold text-truncate" style="font-size: 0.9rem;">Utilisateur</div>
+            <div id="userRole" class="text-muted small text-truncate" style="font-size: 0.75rem;">Rôle</div>
+          </div>
+          <button class="btn btn-link text-muted p-0" onclick="logout()" title="Déconnexion">
+            <i class="bi bi-box-arrow-right"></i>
+          </button>
+        </div>
+        <div class="text-center mt-2 text-muted" style="font-size: 0.65rem;">v2.2 - Dubarry Edwin</div>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <div id="main-spinner" class="position-fixed top-0 end-0 m-3 spinner-border spinner-border-sm text-primary d-none"
+        role="status" style="z-index: 9999;"></div>
+
+      <!-- Mobile Header -->
+      <div class="d-lg-none p-3 border-bottom bg-white d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center gap-2">
+          <img src="/favicon.svg" alt="Logo" style="height: 24px;">
+          <span class="fw-bold">PhotoTracker</span>
+        </div>
+        <button class="btn btn-link text-dark p-0" onclick="toggleSidebar()">
+          <i class="bi bi-list fs-4"></i>
+        </button>
+      </div>
+
+      <div class="content-wrapper">
+        <!-- Panels -->
+        <div id="panelShooter">
+          <div>
+            <div class="table-responsive">
+              <table id="tblShooter" class="table align-middle mb-0">
+                <thead>
+                  <tr>
+                    <th id="thSelect" class="text-center d-none"><input type="checkbox" title="Tout sélectionner"
+                        onchange="toggleAllVisibleSelection(this)">
+                    </th>
+                    <th class="text-nowrap" onclick="sortBy('code_produit')">Code <i class="bi bi-arrow-down-up"></i>
+                    </th>
+                    <th onclick="sortBy('designation')">Désignation <i class="bi bi-arrow-down-up"></i></th>
+                    <th onclick="sortBy('demandeur')">
+                      Demandeur <i class="bi bi-arrow-down-up"></i>
+                      <button class="btn btn-sm" onclick="toggleFilterDropdown(event, 'demandeur')"><i
+                          id="filterIcon_demandeur" class="bi bi-funnel filter-icon"></i></button>
+                    </th>
+                    <th onclick="sortBy('demande')">
+                      Demande <i class="bi bi-arrow-down-up"></i>
+                      <button class="btn btn-sm" onclick="toggleFilterDropdown(event, 'demande')"><i
+                          id="filterIcon_demande" class="bi bi-funnel filter-icon"></i></button>
+                    </th>
+                    <th class="text-nowrap" onclick="sortBy('statut_echantillon')">
+                      Statut échantillon <i class="bi bi-arrow-down-up"></i>
+                      <button class="btn btn-sm" onclick="toggleFilterDropdown(event, 'statut_echantillon')"><i
+                          id="filterIcon_statut_echantillon" class="bi bi-funnel filter-icon"></i></button>
+                    </th>
+                    <th class="text-nowrap" onclick="sortBy('deadline')">Deadline <i class="bi bi-arrow-down-up"></i>
+                    </th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="bodyShooter"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div id="panelOk" class="d-none">
+          <div>
+            <div class="table-responsive">
+              <table id="tblOk" class="table align-middle mb-0">
+                <thead>
+                  <tr>
+                    <th id="thSelectOk" class="text-center d-none"><input type="checkbox" title="Tout sélectionner"
+                        onchange="toggleAllVisibleSelection(this)">
+                    </th>
+                    <th onclick="sortBy('code_produit')">Code <i class="bi bi-arrow-down-up"></i>
+                    </th>
+                    <th onclick="sortBy('designation')">Désignation <i class="bi bi-arrow-down-up"></i></th>
+                    <th onclick="sortBy('demandeur')">
+                      Demandeur <i class="bi bi-arrow-down-up"></i>
+                      <button class="btn btn-sm" onclick="toggleFilterDropdown(event, 'demandeur', '_ok')"><i
+                          id="filterIcon_demandeur_ok" class="bi bi-funnel filter-icon"></i></button>
+                    </th>
+                    <th onclick="sortBy('demande')">
+                      Demande <i class="bi bi-arrow-down-up"></i>
+                      <button class="btn btn-sm" onclick="toggleFilterDropdown(event, 'demande', '_ok')"><i
+                          id="filterIcon_demande_ok" class="bi bi-funnel filter-icon"></i></button>
+                    </th>
+                    <th>Nb vues</th>
+                    <th onclick="sortBy('date_photo_ok')">Date Photo OK <i class="bi bi-arrow-down-up"></i></th>
+                    <th onclick="sortBy('photographe_identifiant')">
+                      Opérateur <i class="bi bi-arrow-down-up"></i>
+                      <button class="btn btn-sm"
+                        onclick="toggleFilterDropdown(event, 'photographe_identifiant', '_ok')"><i
+                          id="filterIcon_photographe_identifiant_ok" class="bi bi-funnel filter-icon"></i></button>
+                    </th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="bodyOk"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div id="panelRequesterView" class="d-none">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h5 class="mb-0">Vue par Demandeur <span id="debugRequesterCount"
+                class="badge bg-warning text-dark ms-2">Init...</span></h5>
+          </div>
+          <div id="accordionRequester" class="accordion">
+            <!-- Accordion items will be injected here -->
+          </div>
+        </div>
+
+        <div id="panelReader" class="d-none">
+          <div>
+            <div class="table-responsive">
+              <table id="tblReader" class="table align-middle mb-0">
+                <thead>
+                  <tr>
+                    <th onclick="sortBy('code_produit')">Code <i class="bi bi-arrow-down-up"></i>
+                    </th>
+                    <th onclick="sortBy('designation')">Désignation <i class="bi bi-arrow-down-up"></i></th>
+                    <th onclick="sortBy('demandeur')">
+                      Demandeur
+                      <button class="btn btn-sm" onclick="toggleFilterDropdown(event, 'demandeur', '_reader')"><i
+                          id="filterIcon_demandeur_reader" class="bi bi-funnel filter-icon"></i></button>
+                    </th>
+                    <th onclick="sortBy('demande')">
+                      Demande
+                      <button class="btn btn-sm" onclick="toggleFilterDropdown(event, 'demande', '_reader')"><i
+                          id="filterIcon_demande_reader" class="bi bi-funnel filter-icon"></i></button>
+                    </th>
+                    <th onclick="sortBy('statut_echantillon')">
+                      Statut Échantillon
+                      <button class="btn btn-sm"
+                        onclick="toggleFilterDropdown(event, 'statut_echantillon', '_reader')"><i
+                          id="filterIcon_statut_echantillon_reader" class="bi bi-funnel filter-icon"></i></button>
+                    </th>
+                    <th onclick="sortBy('statut_photo')">
+                      Statut Photo
+                      <button class="btn btn-sm" onclick="toggleFilterDropdown(event, 'statut_photo', '_reader')"><i
+                          id="filterIcon_statut_photo_reader" class="bi bi-funnel filter-icon"></i></button>
+                    </th>
+                    <th onclick="sortBy('deadline')">Deadline <i class="bi bi-arrow-down-up"></i>
+                    </th>
+                    <th onclick="sortBy('date_photo_ok')">Date Photo OK <i class="bi bi-arrow-down-up"></i></th>
+                    <th onclick="sortBy('photographe_identifiant')">
+                      Opérateur
+                      <button class="btn btn-sm"
+                        onclick="toggleFilterDropdown(event, 'photographe_identifiant', '_reader')"><i
+                          id="filterIcon_photographe_identifiant_reader" class="bi bi-funnel filter-icon"></i></button>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody id="bodyReader"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div id="panelAddList" class="d-none">
+          <div class="row justify-content-center">
+            <div class="col-12 col-md-8 col-lg-6">
+              <div class="card shadow-sm">
+                <div class="card-body">
+                  <h5 class="card-title mb-3">Importer une liste de produits</h5>
+                  <p>Sélectionnez un fichier au format .xlsx ou .csv.</p>
+                  <div class="mb-3">
+                    <label class="form-label">Colonnes attendues :</label>
+                    <code>code_produit, designation, demandeur, demande, statut_echantillon, deadline</code>
+                  </div>
+                  <div class="mb-3">
+                    <label for="importFile" class="form-label">Fichier</label>
+                    <input id="importFile" type="file" accept=".xlsx,.xls,.csv" class="form-control">
+                  </div>
+                  <div class="text-end">
+                    <a href="/phototracker_import_template.xlsx" class="btn btn-outline-secondary me-2"><i
+                        class="bi bi-download"></i>
+                      Télécharger le modèle</a>
+                    <button class="btn btn-primary" onclick="startImport()"><i class="bi bi-cloud-upload"></i>
+                      Importer</button>
+                  </div>
+                  <div id="importMsg" class="mt-3 small text-muted"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="panelUpdateList" class="d-none">
+          <div class="row justify-content-center">
+            <div class="col-12 col-md-8 col-lg-6">
+              <div class="card shadow-sm border-warning">
+                <div class="card-header bg-warning text-dark">
+                  <h5 class="card-title mb-0"><i class="bi bi-arrow-repeat"></i> Mise à jour / Reshoot
+                    en masse</h5>
+                </div>
+                <div class="card-body">
+                  <p>Importez un fichier Excel pour modifier des produits existants et les passer en
+                    "À reshooter".</p>
+                  <div class="alert alert-secondary small">
+                    <strong>Colonnes attendues (en-tête exact) :</strong><br>
+                    <code>code_produit</code>, <code>demandeur</code>, <code>demande</code>,
+                    <code>deadline</code>, <code>reshoot reason</code>
+                  </div>
+                  <div class="mb-3">
+                    <label for="updateImportFile" class="form-label">Fichier (.xlsx, .csv)</label>
+                    <input id="updateImportFile" type="file" accept=".xlsx,.xls,.csv" class="form-control">
+                  </div>
+                  <div class="text-end">
+                    <button class="btn btn-warning" onclick="startUpdateImport()"><i class="bi bi-upload"></i> Lancer la
+                      mise à jour</button>
+                  </div>
+                  <div id="updateImportMsg" class="mt-3"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="panelAdmin" class="d-none">
+          <ul class="nav nav-tabs mb-3">
+            <li class="nav-item"><a class="nav-link active" href="#" data-bs-toggle="tab"
+                data-bs-target="#admin-stats">Statistiques</a></li>
+            <li class="nav-item"><a class="nav-link" href="#" data-bs-toggle="tab"
+                data-bs-target="#admin-reports">Rapports Mensuels</a></li>
+            <li class="nav-item"><a class="nav-link" href="#" data-bs-toggle="tab" data-bs-target="#admin-users"
+                onclick="loadUsers()">Utilisateurs</a></li>
+          </ul>
+          <div class="tab-content">
+            <div class="tab-pane fade show active" id="admin-stats">
+              <!-- Dashboard Header -->
+              <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                  <h4 class="mb-1 fw-bold text-dark">Tableau de bord</h4>
+                  <p class="text-muted small mb-0">Aperçu en temps réel de la production et du backlog.</p>
+                </div>
+                <div class="d-flex gap-2">
+                  <div class="btn-group btn-group-sm bg-white shadow-sm rounded-pill p-1">
+                    <button class="btn btn-light rounded-pill px-3" onclick="setPresetDate('7d')">7j</button>
+                    <button class="btn btn-light rounded-pill px-3" onclick="setPresetDate('30d')">30j</button>
+                    <button class="btn btn-light rounded-pill px-3" onclick="setPresetDate('this_month')">Mois</button>
+                  </div>
+                  <div class="d-flex align-items-center bg-white shadow-sm rounded-pill px-3 py-1 gap-2">
+                    <input type="date" id="adminFrom" class="form-control form-control-sm border-0 bg-transparent p-0"
+                      style="width: 110px;">
+                    <span class="text-muted small"><i class="bi bi-arrow-right"></i></span>
+                    <input type="date" id="adminTo" class="form-control form-control-sm border-0 bg-transparent p-0"
+                      style="width: 110px;">
+                    <button class="btn btn-sm btn-primary rounded-circle" style="width: 32px; height: 32px; padding: 0;"
+                      onclick="loadCharts()"><i class="bi bi-funnel-fill"></i></button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- KPIs Section 1: Backlog (Top Row) -->
+              <h6 class="text-uppercase text-muted fw-bold small mb-3 ls-1">État du Backlog (À shooter)</h6>
+              <div class="row g-3 mb-4">
+                <div class="col-md-3">
+                  <div class="card border-0 shadow-sm h-100 bg-primary text-white position-relative overflow-hidden">
+                    <div class="card-body p-4">
+                      <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                          <p class="mb-1 opacity-75 fw-medium">Total à shooter</p>
+                          <h2 id="kpiTotal" class="mb-0 fw-bold display-6">0</h2>
+                        </div>
+                        <div class="bg-white bg-opacity-25 rounded-circle p-2">
+                          <i class="bi bi-camera fs-4"></i>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- Decorative circle -->
+                    <div class="position-absolute top-0 end-0 translate-middle p-5 bg-white opacity-10 rounded-circle"
+                      style="margin-top: -20px; margin-right: -20px;"></div>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="card border-0 shadow-sm h-100 position-relative overflow-hidden"
+                    style="background: linear-gradient(135deg, #fff 0%, #fef2f2 100%);">
+                    <div class="card-body p-4">
+                      <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                          <p class="mb-1 text-danger fw-medium">Retard > Deadline</p>
+                          <h2 id="kpiRetard" class="mb-0 fw-bold text-danger">0</h2>
+                        </div>
+                        <div class="bg-danger bg-opacity-10 rounded-circle p-2 text-danger">
+                          <i class="bi bi-alarm fs-4"></i>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="card border-0 shadow-sm h-100 position-relative overflow-hidden"
+                    style="background: linear-gradient(135deg, #fff 0%, #fff7ed 100%);">
+                    <div class="card-body p-4">
+                      <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                          <p class="mb-1 text-warning fw-medium">Échantillons Manquants</p>
+                          <h2 id="kpiManquant" class="mb-0 fw-bold text-warning">0</h2>
+                        </div>
+                        <div class="bg-warning bg-opacity-10 rounded-circle p-2 text-warning">
+                          <i class="bi bi-box-seam fs-4"></i>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="card border-0 shadow-sm h-100 position-relative overflow-hidden"
+                    style="background: linear-gradient(135deg, #fff 0%, #f5f3ff 100%);">
+                    <div class="card-body p-4">
+                      <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                          <p class="mb-1 text-primary fw-medium" style="color: #6f42c1;">À mettre DAM</p>
+                          <h2 id="kpiDam" class="mb-0 fw-bold" style="color: #6f42c1;">0</h2>
+                        </div>
+                        <div class="bg-primary bg-opacity-10 rounded-circle p-2" style="color: #6f42c1;">
+                          <i class="bi bi-cloud-upload fs-4"></i>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- KPIs Section 2: Performance (Filtered) -->
+              <h6 class="text-uppercase text-muted fw-bold small mb-3 ls-1">Performance (Période sélectionnée)</h6>
+              <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                  <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body p-3 d-flex align-items-center gap-3">
+                      <div class="rounded-3 p-3 bg-info bg-opacity-10 text-info">
+                        <i class="bi bi-images fs-3"></i>
+                      </div>
+                      <div>
+                        <h3 id="kpiProduitsJour" class="mb-0 fw-bold text-dark">0</h3>
+                        <p class="text-muted small mb-0">Produits shootés</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body p-3 d-flex align-items-center gap-3">
+                      <div class="rounded-3 p-3 bg-success bg-opacity-10 text-success">
+                        <i class="bi bi-eye fs-3"></i>
+                      </div>
+                      <div>
+                        <h3 id="kpiJour" class="mb-0 fw-bold text-dark">0</h3>
+                        <p class="text-muted small mb-0">Vues réalisées</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body p-3 d-flex align-items-center gap-3">
+                      <div class="rounded-3 p-3 bg-purple bg-opacity-10 text-purple"
+                        style="color: #d63384; background-color: rgba(214, 51, 132, 0.1) !important;">
+                        <i class="bi bi-person-heart fs-3"></i>
+                      </div>
+                      <div>
+                        <h3 id="kpiStephanie" class="mb-0 fw-bold text-dark">0</h3>
+                        <p class="text-muted small mb-0">Total Stéphanie</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Charts Grid -->
+              <div class="row g-4">
+                <!-- Row 1: Daily Activity -->
+                <div class="col-lg-8">
+                  <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0">
+                      <h6 class="fw-bold mb-0">Activité Journalière (Vues)</h6>
+                    </div>
+                    <div class="card-body px-4 pb-4">
+                      <div id="chartByDateContainer" class="position-relative w-100" style="height: 250px;">
+                        <canvas id="chartByDate"></canvas>
+                        <div
+                          class="chart-empty-message d-none position-absolute top-50 start-50 translate-middle text-muted">
+                          Pas de données</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-4">
+                  <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0">
+                      <h6 class="fw-bold mb-0">Répartition Backlog</h6>
+                    </div>
+                    <div class="card-body px-4 pb-4">
+                      <div id="chartByStatusContainer" class="position-relative w-100" style="height: 250px;">
+                        <canvas id="chartByStatus"></canvas>
+                        <div
+                          class="chart-empty-message d-none position-absolute top-50 start-50 translate-middle text-muted">
+                          Pas de données</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Row 2: Photographers & Typology -->
+                <div class="col-lg-6">
+                  <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0">
+                      <h6 class="fw-bold mb-0">Performance Photographes</h6>
+                    </div>
+                    <div class="card-body px-4 pb-4">
+                      <div id="chartByPhotographerContainer" class="position-relative w-100" style="height: 300px;">
+                        <canvas id="chartByPhotographer"></canvas>
+                        <div
+                          class="chart-empty-message d-none position-absolute top-50 start-50 translate-middle text-muted">
+                          Pas de données</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-6">
+                  <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0">
+                      <h6 class="fw-bold mb-0">Backlog par Demandeur</h6>
+                    </div>
+                    <div class="card-body px-4 pb-4">
+                      <div id="chartRemainingByTypeContainer" class="position-relative w-100" style="height: 300px;">
+                        <canvas id="chartRemainingByType"></canvas>
+                        <div
+                          class="chart-empty-message d-none position-absolute top-50 start-50 translate-middle text-muted">
+                          Pas de données</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Row 3: Retoucheurs -->
+                <div class="col-12">
+                  <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0">
+                      <h6 class="fw-bold mb-0">Activité Retoucheurs (Codes traités)</h6>
+                    </div>
+                    <div class="card-body px-4 pb-4">
+                      <div id="chartByRetoucheurContainer" class="position-relative w-100" style="height: 200px;">
+                        <canvas id="chartByRetoucheur"></canvas>
+                        <div
+                          class="chart-empty-message d-none position-absolute top-50 start-50 translate-middle text-muted">
+                          Pas de données</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="tab-pane fade" id="admin-reports">
+              <h5>Générer un rapport mensuel</h5>
+              <div class="card shadow-sm mb-3">
+                <div class="card-body d-flex align-items-center gap-2">
+                  <label for="reportMonth" class="form-label mb-0">Choisir un mois :</label>
+                  <input type="month" id="reportMonth" class="form-control" style="width: auto;">
+                  <button class="btn btn-primary" onclick="generateMonthlyReport()">
+                    <i class="bi bi-file-earmark-text me-1"></i> Générer
+                  </button>
+                </div>
+              </div>
+
+              <div id="reportResult" class="d-none">
+                <h4 id="reportTitle" class="mb-3"></h4>
+                <div class="row g-3">
+                  <div class="col-lg-6">
+                    <div class="card shadow-sm h-100">
+                      <div class="card-header"><strong>Production des Photographes</strong></div>
+                      <div class="card-body">
+                        <div class="row text-center">
+                          <div class="col-6">
+                            <h3 id="reportTotalProducts" class="text-primary">0</h3>
+                            <p class="text-muted">Produits shootés</p>
+                          </div>
+                          <div class="col-6">
+                            <h3 id="reportTotalViews" class="text-primary">0</h3>
+                            <p class="text-muted">Vues réalisées</p>
+                          </div>
+                        </div>
+                        <hr>
+                        <h6 class="mt-3">Détail par photographe :</h6>
+                        <table class="table table-sm table-striped">
+                          <thead>
+                            <tr>
+                              <th>Photographe</th>
+                              <th>Produits</th>
+                              <th>Vues</th>
+                            </tr>
+                          </thead>
+                          <tbody id="reportPerfBody"></tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="col-lg-6">
+                    <div class="card shadow-sm h-100">
+                      <div class="card-header"><strong>Performance sur les Délais</strong></div>
+                      <div class="card-body">
+                        <div class="row text-center">
+                          <div class="col-4">
+                            <h3 id="reportOnTime" class="text-success">0%</h3>
+                            <p class="text-muted">À l'heure</p>
+                          </div>
+                          <div class="col-4">
+                            <h3 id="reportLate" class="text-danger">0</h3>
+                            <p class="text-muted">En retard</p>
+                          </div>
+                          <div class="col-4">
+                            <h3 id="reportAvgDelay" class="text-info">0 j</h3>
+                            <p class="text-muted">Délai moyen</p>
+                          </div>
+                        </div>
+                        <hr>
+                        <p class="small text-muted mt-3">Ces statistiques sont calculées
+                          uniquement sur les produits shootés par les photographes durant le
+                          mois et qui avaient une deadline définie.</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="col-12">
+                    <div class="card shadow-sm">
+                      <div class="card-header"><strong>Production par Type de Demande</strong>
+                      </div>
+                      <div class="card-body">
+                        <table class="table table-sm table-striped">
+                          <thead>
+                            <tr>
+                              <th>Type</th>
+                              <th>Produits traités</th>
+                              <th>Vues réalisées</th>
+                            </tr>
+                          </thead>
+                          <tbody id="reportByTypeBody"></tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="col-12">
+                    <div class="card shadow-sm">
+                      <div class="card-header"><strong>État du Backlog Actuel (Restant à
+                          shooter)</strong></div>
+                      <div class="card-body">
+                        <div class="row text-center">
+                          <div class="col-md-6 offset-md-3">
+                            <h3 id="reportTotalBacklog" class="text-warning">0</h3>
+                            <p class="text-muted">Total restant à shooter</p>
+                          </div>
+                        </div>
+                        <hr>
+                        <h6 class="mt-3">Détail par statut d'échantillon :</h6>
+                        <table class="table table-sm table-striped">
+                          <thead>
+                            <tr>
+                              <th>Statut</th>
+                              <th>Nombre de produits</th>
+                            </tr>
+                          </thead>
+                          <tbody id="reportBacklogBody"></tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="tab-pane fade" id="admin-users">
+              <h5>Gestion des utilisateurs</h5>
+              <div class="card">
+                <div class="card-body">
+                  <form id="addUserForm" class="row g-3 align-items-end mb-4">
+                    <div class="col-md-3"><label class="form-label">Identifiant</label><input type="text"
+                        id="addIdentifiant" class="form-control" required></div>
+                    <div class="col-md-4"><label class="form-label">Email</label><input type="email" id="addEmail"
+                        class="form-control" required></div>
+                    <div class="col-md-3"><label class="form-label">Rôle</label><select id="addRole"
+                        class="form-select">
+                        <option value="photographe">Photographe</option>
+                        <option value="assistante">Assistante</option>
+                        <option value="admin">Admin</option>
+                        <option value="retoucheur">Retoucheur</option>
+                        <option value="lecteur">Lecteur</option>
+                      </select></div>
+                    <div class="col-md-2"><button type="submit" class="btn btn-primary w-100">Ajouter</button></div>
+                  </form>
+                  <div id="tempPasswordResult" class="alert alert-warning d-none"></div>
+                  <div class="table-responsive">
+                    <table class="table">
+                      <thead>
+                        <tr>
+                          <th>Identifiant</th>
+                          <th>Email</th>
+                          <th>Rôle</th>
+                          <th>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody id="usersTableBody"></tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div id="bulkActionsBar" class="d-none">
+    <div class="container-fluid d-flex align-items-center">
+      <span id="selCount" class="me-3 fw-bold text-primary">0 sélectionné(s)</span>
+      <div class="btn-group">
+        <button class="btn btn-sm btn-outline-primary" onclick="openBulkModal('change_status')"
+          title="Changer le statut"><i class="bi bi-tag-fill"></i><span>Statut</span></button>
+        <button class="btn btn-sm btn-outline-primary" onclick="openBulkModal('change_demandeur')"
+          title="Changer le demandeur"><i class="bi bi-person-check"></i><span>Demandeur</span></button>
+        <button class="btn btn-sm btn-outline-primary" onclick="openBulkModal('change_demande')"
+          title="Changer la demande"><i class="bi bi-pencil-fill"></i><span>Demande</span></button>
+        <button class="btn btn-sm btn-outline-primary" onclick="openBulkModal('change_deadline')"
+          title="Changer la deadline"><i class="bi bi-calendar-event"></i><span>Deadline</span></button>
+        <button class="btn btn-sm btn-outline-secondary" onclick="copySelectedCodes()" title="Copier les codes"><i
+            class="bi bi-clipboard-check"></i><span>Copier</span></button>
+        <button class="btn btn-sm btn-outline-info" onclick="openRelance()" title="Envoyer une relance"><i
+            class="bi bi-envelope-fill"></i><span>Relancer</span></button>
+        <button class="btn btn-sm btn-outline-danger" onclick="openBulkModal('delete')" title="Supprimer"><i
+            class="bi bi-trash-fill"></i><span>Supprimer</span></button>
+      </div>
+      <button type="button" class="btn-close ms-3" title="Désélectionner tout" onclick="deselectAll()"></button>
+    </div>
+  </div>
+
+  <!-- Filter Menus Container (positioned dynamically) -->
+  <div id="filterMenusContainer">
+    <!-- Shooter Tab -->
+    <div id="filterMenu_demandeur" class="filter-menu"></div>
+    <div id="filterMenu_demande" class="filter-menu"></div>
+    <div id="filterMenu_statut_echantillon" class="filter-menu"></div>
+    <div id="filterMenu_photographe_identifiant" class="filter-menu"></div>
+
+    <!-- Ok Tab -->
+    <div id="filterMenu_demandeur_ok" class="filter-menu"></div>
+    <div id="filterMenu_demande_ok" class="filter-menu"></div>
+    <div id="filterMenu_photographe_identifiant_ok" class="filter-menu"></div>
+
+    <!-- Reader Tab -->
+    <div id="filterMenu_demandeur_reader" class="filter-menu"></div>
+    <div id="filterMenu_demande_reader" class="filter-menu"></div>
+    <div id="filterMenu_statut_echantillon_reader" class="filter-menu"></div>
+    <div id="filterMenu_statut_photo_reader" class="filter-menu"></div>
+    <div id="filterMenu_photographe_identifiant_reader" class="filter-menu"></div>
+
+    <!-- Other -->
+    <div id="filterMenu_statut_photo" class="filter-menu"></div>
+  </div>
+
+  <!-- MODALS -->
+  <div class="modal fade" id="modalOk" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="okTitle">Photo OK</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <p class="mb-2 fw-bold">Nombre de vues :</p>
+          <input id="okProductId" type="hidden">
+          <input id="okVues" type="hidden">
+
+          <div id="okBtnGroup" class="btn-group w-100 mb-3" role="group">
+            <button type="button" class="btn btn-lg btn-outline-primary" onclick="selectVues(1)">1</button>
+            <button type="button" class="btn btn-lg btn-outline-primary" onclick="selectVues(2)">2</button>
+            <button type="button" class="btn btn-lg btn-outline-primary" onclick="selectVues(3)">3</button>
+            <button type="button" class="btn btn-lg btn-outline-primary" onclick="selectVues(4)">4</button>
+            <button type="button" class="btn btn-lg btn-outline-primary" onclick="selectVues(5)">5</button>
+            <button type="button" class="btn btn-lg btn-outline-primary" onclick="selectVues(6)">6</button>
+          </div>
+
+          <div id="okOtherGroup">
+            <button id="btnOtherVues" type="button" class="btn btn-outline-secondary w-100"
+              onclick="selectOtherVues()">Autre...</button>
+            <div id="okOtherInputContainer" class="mt-3 d-none">
+              <label class="form-label">Nombre de vues personnalisé :</label>
+              <input id="okOtherInput" type="number" class="form-control" min="1" placeholder="Ex: 7">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+          <button class="btn btn-success" onclick="confirmOk()">Valider</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="modalBulkStatus" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Changement statut échantillon</h5><button type="button" class="btn-close"
+            data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body"><label class="form-label">Nouveau statut</label><select id="bulkStatusSelect"
+            class="form-select">
+            <option>Reçu</option>
+            <option>À venir</option>
+            <option>Manquant</option>
+            <option>Relancé</option>
+            <option>Retour relance</option>
+            <option>Déjà shooté</option>
+            <option>Pas reçu</option>
+            <option>À mettre DAM</option>
+          </select></div>
+        <div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button><button
+            class="btn btn-warning" onclick="confirmBulkAction()">Appliquer</button></div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="modalBulkDemandeur" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Changer le demandeur</h5><button type="button" class="btn-close"
+            data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body"><label class="form-label">Nouveau demandeur</label><input id="bulkDemandeurInput"
+            type="text" class="form-control"></div>
+        <div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button><button
+            class="btn btn-primary" onclick="confirmBulkAction()">Appliquer</button></div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="modalBulkDemande" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Changer la demande</h5><button type="button" class="btn-close"
+            data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body"><label class="form-label">Nouvelle demande</label><input id="bulkDemandeInput"
+            type="text" class="form-control"></div>
+        <div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button><button
+            class="btn btn-primary" onclick="confirmBulkAction()">Appliquer</button></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="modalBulkDeadline" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Changer la deadline en masse</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <label class="form-label">Nouvelle deadline</label>
+          <input id="bulkDeadlineInput" type="date" class="form-control">
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+          <button class="btn btn-primary" onclick="confirmBulkAction()">Appliquer</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="modalConfirm" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="confirmTitle">Confirmation</h5><button type="button" class="btn-close"
+            data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <p id="confirmMessage"></p>
+        </div>
+        <div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button><button
+            class="btn btn-danger" id="confirmButton" onclick="confirmBulkAction()">Confirmer</button></div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="modalRelance" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Relancer par mail</h5><button type="button" class="btn-close"
+            data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body"><label class="form-label">Destinataire (email)</label><input id="relanceTo" type="email"
+            class="form-control" placeholder="contact@exemple.com">
+          <div class="form-text">Ouvre votre application de mail par défaut avec le message prérempli.</div>
+        </div>
+        <div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button><button
+            class="btn btn-primary" onclick="confirmRelance()">Composer</button></div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="modalChangePassword" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="changePasswordTitle">Changer votre mot de passe</h5>
+        </div>
+        <div class="modal-body">
+          <p id="changePasswordMessage" class="d-none">Pour des raisons de sécurité, vous devez définir un nouveau
+            mot de passe personnel.</p>
+          <div class="mb-3">
+            <label class="form-label">Nouveau mot de passe</label>
+            <input type="password" id="newPassword" class="form-control">
+            <div class="form-text">8 caractères minimum.</div>
+          </div>
+          <div id="changePasswordError" class="text-danger small"></div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-primary" onclick="confirmChangePassword()">Enregistrer le mot de passe</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="modalEditUser" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editUserTitle">Modifier l'utilisateur</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="editUserForm">
+            <input type="hidden" id="editUserId">
+            <div class="mb-3">
+              <label class="form-label">Identifiant</label>
+              <input type="text" id="editIdentifiant" class="form-control" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Email</label>
+              <input type="email" id="editEmail" class="form-control" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Rôle</label>
+              <select id="editRole" class="form-select">
+                <option value="photographe">Photographe</option>
+                <option value="assistante">Assistante</option>
+                <option value="admin">Admin</option>
+                <option value="retoucheur">Retoucheur</option>
+                <option value="lecteur">Lecteur</option>
+              </select>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+          <button type="button" class="btn btn-primary" onclick="confirmEditUser()">Enregistrer</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="modalResetPassword" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="resetPasswordTitle">Réinitialiser le mot de passe</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <p>Êtes-vous sûr de vouloir réinitialiser le mot de passe de cet utilisateur ? Un nouveau mot de passe
+            temporaire sera généré.</p>
+          <input type="hidden" id="resetPasswordId">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+          <button type="button" class="btn btn-danger" onclick="confirmResetPassword()">Réinitialiser</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="toast-container">
+    <div class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive"
+      aria-atomic="true" id="toastMessage">
+      <div class="d-flex">
+        <div class="toast-body" id="toastBody">
+          Notification
+        </div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+          aria-label="Close"></button>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="modalImportReport" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Rapport d'importation</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div id="insertedSection" class="mb-4">
+            <h5><span class="badge bg-success me-2" id="insertedCount">0</span>Produits importés avec succès
+            </h5>
+            <div class="table-responsive" style="max-height: 200px;">
+              <table class="table table-sm table-striped">
+                <thead>
+                  <tr>
+                    <th>Code</th>
+                    <th>Désignation</th>
+                  </tr>
+                </thead>
+                <tbody id="insertedBody"></tbody>
+              </table>
+            </div>
+          </div>
+          <div id="alreadyShooterSection" class="mb-4">
+            <h5><span class="badge bg-warning text-dark me-2" id="alreadyShooterCount">0</span>Produits "À
+              shooter" déjà présents (ignorés)</h5>
+            <p class="small text-muted">Ces produits étaient déjà dans la liste "À shooter". Aucune modification
+              n'a été apportée.</p>
+            <div class="table-responsive" style="max-height: 200px;">
+              <table class="table table-sm table-striped">
+                <thead>
+                  <tr>
+                    <th>Code</th>
+                    <th>Désignation</th>
+                  </tr>
+                </thead>
+                <tbody id="alreadyShooterBody"></tbody>
+              </table>
+            </div>
+          </div>
+          <div id="alreadyOkSection">
+            <h5><span class="badge bg-info text-dark me-2" id="alreadyOkCount">0</span>Produits "Photo OK" déjà
+              présents (ignorés)</h5>
+            <p class="small text-muted">Ces produits ont déjà été shootés par le passé. Aucune modification n'a
+              été apportée.</p>
+            <div class="table-responsive" style="max-height: 200px;">
+              <table class="table table-sm table-striped">
+                <thead>
+                  <tr>
+                    <th>Code</th>
+                    <th>Désignation</th>
+                  </tr>
+                </thead>
+                <tbody id="alreadyOkBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Fermer</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="modalReshoot" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Demande de Reshoot</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="reshootId">
+          <div class="mb-3">
+            <label class="form-label">Pourquoi faut-il refaire ce produit ?</label>
+            <textarea id="reshootReason" class="form-control" rows="3"
+              placeholder="Ex: Reflet, mauvaise couleur, angle..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+          <button class="btn btn-danger" onclick="confirmReshoot()">Valider</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="modalEditProduct" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Modifier le Produit</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="editProductId">
+          <div class="mb-3">
+            <label class="form-label">Code Produit</label>
+            <input type="text" id="editCode" class="form-control" readonly>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Désignation</label>
+            <input type="text" id="editDesignation" class="form-control" placeholder="Désignation du produit">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Demandeur</label>
+            <input type="text" id="editDemandeur" class="form-control" placeholder="Demandeur">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Demande</label>
+            <input type="text" id="editDemande" class="form-control" placeholder="Demande">
+          </div>
+          <div class="mb-3">
+            <div class="mb-3">
+              <label class="form-label">Statut Échantillon</label>
+              <select id="editStatut" class="form-select">
+                <option value="">-- Sélectionner --</option>
+                <option value="Reçu">Reçu</option>
+                <option value="À venir">À venir</option>
+                <option value="Manquant">Manquant</option>
+                <option value="Relancé">Relancé</option>
+                <option value="Retour relance">Retour relance</option>
+                <option value="Déjà shooté">Déjà shooté</option>
+                <option value="Pas reçu">Pas reçu</option>
+                <option value="À mettre DAM">À mettre DAM</option>
+                <option value="Reshooté">Reshooté</option>
+              </select>
+            </div>
+            <div class="mb-3" id="editRelanceCommentContainer">
+              <label class="form-label">Commentaire Relance / Info</label>
+              <textarea id="editRelanceComment" class="form-control" rows="3" placeholder="Détails..."></textarea>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Deadline</label>
+              <input type="date" id="editDeadline" class="form-control">
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+            <button class="btn btn-primary" onclick="confirmEditProduct()">Enregistrer</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal fade" id="modalFilters" tabindex="-1">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Filtres du tableau</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <h6 class="text-muted text-uppercase small fw-bold mb-2">Demande</h6>
+                <div id="filterList_demande" class="filter-list" style="max-height: 200px; overflow-y: auto;">
+                  <!-- Checkboxes will be populated here -->
+                </div>
+              </div>
+              <div class="col-md-6">
+                <h6 class="text-muted text-uppercase small fw-bold mb-2">Demandeur</h6>
+                <div id="filterList_demandeur" class="filter-list" style="max-height: 200px; overflow-y: auto;">
+                  <!-- Checkboxes will be populated here -->
+                </div>
+              </div>
+              <div class="col-md-6">
+                <h6 class="text-muted text-uppercase small fw-bold mb-2">Statut Échantillon</h6>
+                <div id="filterList_statut_echantillon" class="filter-list"
+                  style="max-height: 200px; overflow-y: auto;">
+                  <!-- Checkboxes will be populated here -->
+                </div>
+              </div>
+              <div class="col-md-6" id="filterSection_photographe">
+                <h6 class="text-muted text-uppercase small fw-bold mb-2">Photographe</h6>
+                <div id="filterList_photographe_identifiant" class="filter-list"
+                  style="max-height: 200px; overflow-y: auto;">
+                  <!-- Checkboxes will be populated here -->
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-outline-secondary" onclick="resetFilters()">
+              <i class="bi bi-x-circle"></i> Réinitialiser
+            </button>
+            <button class="btn btn-primary" onclick="applyFilters()">
+              <i class="bi bi-check-circle"></i> Appliquer
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // --- VARIABLES GLOBALES ---
+      let lastRenderedShooterRows = [];
+      let uniqueValues = { 'demandeur': [], 'demande': [], 'statut_echantillon': [], 'photographe_identifiant': [], 'statut_photo': [] };
+      let activeFilters = { 'demandeur': new Set(), 'demande': new Set(), 'statut_echantillon': new Set(), 'photographe_identifiant': new Set(), 'statut_photo': new Set() };
+      let currentUser = null;
+      let currentTab = 'shooter';
+      let sortKey = null;
+      let sortAsc = true;
+      let selectedIds = new Set();
+      let okModal, bulkStatusModal, bulkDemandeurModal, bulkDemandeModal, bulkDeadlineModal, confirmModal, relanceModal, changePasswordModal, editUserModal, resetPasswordModal, importReportModal, editProductModal, filtersModal;
+      let chartDate, chartPhotographer, chartRemaining, chartStatus, chartRetoucheur;
+      let lastRows = [];
+      let currentBulkAction = '';
+      let autoRefreshInterval = null;
+      let fullTabRows = []; // Stocke la liste complète de l'onglet, non filtrée
+
+      // --- FONCTIONS UTILITAIRES ---
+      const spinner = document.getElementById('main-spinner');
+      function showSpinner() { if (spinner) spinner.classList.remove('d-none'); }
+      function hideSpinner() { if (spinner) spinner.classList.add('d-none'); }
+
+      async function fetchJSON(url, options = {}) {
+        const opts = Object.assign({ credentials: 'include' }, options);
+        const res = await fetch(url, opts);
+        const ct = res.headers.get('content-type') || '';
+        if (!res.ok) {
+          if (ct.includes('application/json')) {
+            const errData = await res.json();
+            throw new Error(errData.error || `Erreur HTTP ${res.status}`);
+          }
+          const text = await res.text();
+          throw new Error(text.slice(0, 200) || `Erreur HTTP ${res.status}`);
+        }
+        if (ct.includes('application/json')) return res.json();
+        return res.text();
+      }
+      function formatDisplayCode(code) {
+        if (!code) return '';
+        // Remplace un tiret bas suivi de chiffres à la fin de la chaine par rien
+        return code.toString().replace(/_\d+$/, '');
+      }
+      function showToast(message, type = 'success') {
+        const toastElement = document.getElementById('toastMessage');
+        const toastBody = document.getElementById('toastBody');
+        toastElement.className = `toast align-items-center text-white bg-${type} border-0`;
+        toastBody.textContent = message;
+        const toast = new bootstrap.Toast(toastElement);
+        toast.show();
+      }
+
+      function normalizeDateJS(s) {
+        if (!s) return '';
+        s = String(s).trim();
+        if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+        let m = s.match(/^(\d{1,2})[/\-.](\d{1,2})[/\-.](\d{4})$/);
+        if (m) return `${m[3]}-${String(m[2]).padStart(2, '0')}-${String(m[1]).padStart(2, '0')}`;
+        m = s.match(/^(\d{1,2})[/\-.](\d{1,2})[/\-.](\d{2})$/);
+        if (m) {
+          let year = parseInt(m[3], 10);
+          year += (year < 70) ? 2000 : 1900;
+          return `${year}-${String(m[2]).padStart(2, '0')}-${String(m[1]).padStart(2, '0')}`;
+        }
+        return '';
+      }
+
+      function formatFR(iso) { if (!iso) return ''; try { return new Date(iso).toLocaleDateString('fr-FR'); } catch { return iso; } }
+      function formatFRDT(iso) { if (!iso) return ''; try { return new Date(iso.replace(' ', 'T')).toLocaleString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' }); } catch (e) { return iso; } }
+      function slugify(str) {
+        if (!str) return '';
+        str = str.toString().toLowerCase();
+        const accents = 'àáâäæãåāăąçćčđďèéêëēėęěğǵḧîïíīįìłḿñńǹňôöòóœøōõőṕŕřßśšşșťțûüùúūǘůűųẃẍÿýžźż';
+        const sansAccents = 'aaaaaaaaaacccddeeeeeeeegghiiiiiilmnnnnoooooooooprrssssssttuuuuuuuuuwxyyzzz';
+        for (let i = 0; i < accents.length; i++) {
+          str = str.replace(new RegExp(accents[i], 'g'), sansAccents[i]);
+        }
+        return str.replace(/\s+/g, '-').replace(/[^\w\-]+/g, '').replace(/\-\-+/g, '-');
+      }
+      function badgeStatut(s) {
+        const className = slugify(s || 'vide');
+        const cls = 'badge badge-status badge-' + className;
+        return `<span class="${cls}">${s || '(Vide)'}</span>`;
+      }
+
+
+      // --- INITIALISATION ---
+      document.addEventListener('DOMContentLoaded', async () => {
+        okModal = new bootstrap.Modal('#modalOk');
+        bulkStatusModal = new bootstrap.Modal('#modalBulkStatus');
+        bulkDemandeurModal = new bootstrap.Modal('#modalBulkDemandeur');
+        bulkDemandeModal = new bootstrap.Modal('#modalBulkDemande');
+        bulkDeadlineModal = new bootstrap.Modal('#modalBulkDeadline');
+        confirmModal = new bootstrap.Modal('#modalConfirm');
+        relanceModal = new bootstrap.Modal('#modalRelance');
+        changePasswordModal = new bootstrap.Modal('#modalChangePassword');
+        editUserModal = new bootstrap.Modal('#modalEditUser');
+        resetPasswordModal = new bootstrap.Modal('#modalResetPassword');
+        importReportModal = new bootstrap.Modal('#modalImportReport');
+        editProductModal = new bootstrap.Modal('#modalEditProduct');
+        filtersModal = new bootstrap.Modal('#modalFilters');
+
+        document.getElementById('addUserForm').addEventListener('submit', addUser);
+        document.addEventListener('click', (e) => {
+          if (!e.target.closest('.filter-menu') && !e.target.closest('[onclick^="toggleFilterDropdown"]')) {
+            document.querySelectorAll('.filter-menu.is-visible').forEach(m => m.classList.remove('is-visible'));
+          }
+        });
+
+        showSpinner();
+        try {
+          const js = await fetchJSON('api/current_user.php');
+          if (js.user) {
+            currentUser = js.user;
+            await afterLogin();
+          } else {
+            document.body.classList.add('login-active');
+          }
+        } catch (e) {
+          console.error(e);
+          document.body.classList.add('login-active');
+        } finally {
+          hideSpinner();
+        }
+      });
+
+      // --- GESTION DE SESSION ---
+      async function login() {
+        const ident = document.getElementById('loginIdent').value.trim();
+        const pass = document.getElementById('loginPass').value.trim();
+        document.getElementById('loginErr').textContent = '';
+        showSpinner();
+        try {
+          const js = await fetchJSON('api/login.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ identifiant: ident, password: pass }) });
+          if (!js.success) { document.getElementById('loginErr').textContent = js.error || 'Erreur'; return; }
+          currentUser = js.user;
+          await afterLogin();
+        } catch (err) {
+          document.getElementById('loginErr').textContent = 'Erreur: ' + err.message;
+        } finally {
+          hideSpinner();
+        }
+      }
+
+      async function logout() {
+        showSpinner();
+        await fetchJSON('api/logout.php');
+        location.reload();
+      }
+
+      async function afterLogin() {
+        document.body.classList.remove('login-active');
+
+        const safeToggle = (id, shouldBeHidden) => {
+          const el = document.getElementById(id);
+          if (el) el.classList.toggle('d-none', shouldBeHidden);
+        };
+
+        document.getElementById('userName').textContent = currentUser.identifiant;
+        document.getElementById('userRole').textContent = currentUser.role.charAt(0).toUpperCase() + currentUser.role.slice(1);
+
+        // Avatar Logic
+        const initials = currentUser.identifiant.substring(0, 2).toUpperCase();
+        document.getElementById('userInitials').textContent = initials;
+
+        // Generate color from name
+        let hash = 0;
+        for (let i = 0; i < currentUser.identifiant.length; i++) {
+          hash = currentUser.identifiant.charCodeAt(i) + ((hash << 5) - hash);
+        }
+        const c = (hash & 0x00FFFFFF).toString(16).toUpperCase();
+        const color = '#' + '00000'.substring(0, 6 - c.length) + c;
+
+        const avatarEl = document.querySelector('.avatar-circle');
+        if (avatarEl) {
+          avatarEl.style.backgroundColor = color;
+          avatarEl.classList.remove('bg-primary');
+        }
+
+        safeToggle('user-menu', false);
+
+        if (currentUser.must_change_password) {
+          document.getElementById('changePasswordMessage').classList.remove('d-none');
+          changePasswordModal.show();
+          return;
+        }
+
+        await getUniqueValues();
+
+        if (currentUser.role === 'lecteur') {
+          // document.querySelector('.btn-group[role="group"]').classList.add('d-none'); // Sidebar handles this
+          safeToggle('exportButton', true);
+          safeToggle('loginBox', true);
+          document.getElementById('appBox').classList.remove('d-none');
+
+          // Hide all nav items first
+          document.querySelectorAll('.nav-link').forEach(el => el.classList.add('d-none'));
+
+          // Show "Par Demandeur" for readers
+          const btnRequester = document.getElementById('btnByRequester');
+          if (btnRequester) btnRequester.classList.remove('d-none');
+          // Show only reader relevant items if needed, or just rely on showReader logic?
+          // Actually, reader sees everything? No, reader sees "Reader" panel.
+          // The original code had: safeToggle('panelShooter', true); safeToggle('panelOk', true); ... safeToggle('panelReader', false);
+
+          // Let's adjust sidebar visibility based on role
+          document.getElementById('btnShooter').classList.add('d-none');
+          document.getElementById('btnOk').classList.add('d-none');
+          document.getElementById('btnAddList').classList.add('d-none');
+          document.getElementById('btnUpdateList').classList.add('d-none');
+          document.getElementById('btnAdmin').classList.add('d-none');
+
+          // But wait, the reader needs to see SOMETHING.
+          // The original code showed panelReader.
+          // I need to add a "Reader" link to the sidebar if role is reader.
+          // Or reuse one of the existing links?
+          // The original code didn't have a button for Reader, it just showed it.
+          // I should add a Reader link in the sidebar for consistency, or just show it by default.
+
+          // Let's add a Reader link dynamically or unhide it.
+          // I didn't add a Reader link in the HTML. I should have.
+          // I will add it via JS for now to avoid rewriting Part 1.
+
+          const nav = document.querySelector('.sidebar-nav');
+          if (!document.getElementById('btnReader')) {
+            const btn = document.createElement('a');
+            btn.id = 'btnReader';
+            btn.className = 'nav-link tab-btn active';
+            btn.innerHTML = '<i class="bi bi-eye"></i> Consultation';
+            btn.onclick = function () { showReader(); };
+            nav.insertBefore(btn, nav.firstChild);
+          }
+
+          showReader();
+
+        } else {
+          const isAdmin = currentUser.role === 'admin';
+          const isAssistante = currentUser.role === 'assistante';
+          const isAdminOrAssistante = isAdmin || isAssistante;
+
+          safeToggle('btnAdmin', !isAdmin);
+          safeToggle('btnAddList', !isAdminOrAssistante);
+          safeToggle('btnUpdateList', !isAdminOrAssistante);
+          safeToggle('thSelect', !isAdminOrAssistante);
+          safeToggle('thSelectOk', !isAdminOrAssistante);
+          safeToggle('exportButton', !isAdminOrAssistante);
+
+          safeToggle('loginBox', true);
+          safeToggle('appBox', false);
+          initApp();
+        }
+
+        if (currentUser.role === 'retoucheur') {
+          document.body.classList.add('role-retoucheur');
+          const tableBody = document.getElementById('bodyShooter');
+          if (tableBody) {
+            tableBody.addEventListener('mousemove', function (e) {
+              if (e.target.closest('tr')) {
+                createSparkle(e.pageX, e.pageY);
+              }
+            });
+          }
+        }
+        if (currentUser.role === 'photographe') {
+          document.body.classList.add('role-photographe');
+        }
+      }
+
+
+      // --- GESTION DE L'APPLICATION ---
+      function initApp() { showShooter(); }
+      function startAutoRefresh() { stopAutoRefresh(); autoRefreshInterval = setInterval(loadData, 30000); }
+      function stopAutoRefresh() { if (autoRefreshInterval) { clearInterval(autoRefreshInterval); autoRefreshInterval = null; } }
+
+      function createSparkle(x, y) {
+        const sparkle = document.createElement('div');
+        sparkle.className = 'sparkle';
+        document.body.appendChild(sparkle);
+        const size = Math.random() * 6 + 3;
+        const colors = ['#FFD700', '#FFC700', '#FFFFFF', '#F9F871'];
+        const randomColor = colors[Math.floor(Math.random() * colors.length)];
+        sparkle.style.width = `${size}px`;
+        sparkle.style.height = `${size}px`;
+        sparkle.style.background = randomColor;
+        sparkle.style.boxShadow = `0 0 8px ${randomColor}`;
+        sparkle.style.left = `${x + (Math.random() * 20 - 10)}px`;
+        sparkle.style.top = `${y + (Math.random() * 20 - 10)}px`;
+        setTimeout(() => { sparkle.remove(); }, 800);
+      }
+
+      // --- GESTION DES ONGLETS ---
+      function showShooter() {
+        resetAllFilters();
+        sortKey = null;
+        currentTab = 'shooter';
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('btnShooter').classList.add('active');
+        document.querySelectorAll('[id^=panel]').forEach(p => p.classList.add('d-none'));
+        document.getElementById('panelShooter').classList.remove('d-none');
+        loadData();
+        startAutoRefresh();
+      }
+      function showUpdateList() {
+        resetAllFilters();
+        sortKey = null;
+        currentTab = 'updatelist';
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('btnUpdateList').classList.add('active');
+        document.querySelectorAll('[id^=panel]').forEach(p => p.classList.add('d-none'));
+        document.getElementById('panelUpdateList').classList.remove('d-none');
+        stopAutoRefresh();
+      }
+      function showOk() {
+        resetAllFilters();
+        sortKey = null;
+        currentTab = 'ok';
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('btnOk').classList.add('active');
+        document.querySelectorAll('[id^=panel]').forEach(p => p.classList.add('d-none'));
+        document.getElementById('panelOk').classList.remove('d-none');
+        loadData();
+        stopAutoRefresh();
+      }
+      function showAddList() {
+        resetAllFilters();
+        sortKey = null;
+        currentTab = 'addlist';
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('btnAddList').classList.add('active');
+        document.querySelectorAll('[id^=panel]').forEach(p => p.classList.add('d-none'));
+        document.getElementById('panelAddList').classList.remove('d-none');
+        stopAutoRefresh();
+      }
+      function showAdmin() {
+        resetAllFilters();
+        sortKey = null;
+        currentTab = 'admin';
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('btnAdmin').classList.add('active');
+        document.querySelectorAll('[id^=panel]').forEach(p => p.classList.add('d-none'));
+        document.getElementById('panelAdmin').classList.remove('d-none');
+        loadCharts();
+        stopAutoRefresh();
+      }
+      function showReader() {
+        resetAllFilters();
+        sortKey = null;
+        currentTab = 'reader'; // Custom tab name
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        if (document.getElementById('btnReader')) document.getElementById('btnReader').classList.add('active');
+        document.querySelectorAll('[id^=panel]').forEach(p => p.classList.add('d-none'));
+        document.getElementById('panelReader').classList.remove('d-none');
+        loadData();
+        stopAutoRefresh();
+      }
+
+      // --- GESTION DES FILTRES ET TRI ---
+      async function getUniqueValues() {
+        showSpinner();
+        try {
+          const js = await fetchJSON('api/get_unique_values.php');
+          if (js.success) {
+            uniqueValues.demandeur = js.demandeurs || [];
+            uniqueValues.demande = js.demandes || [];
+            uniqueValues.statut_echantillon = js.statuses || [];
+            uniqueValues.photographe_identifiant = js.photographers || [];
+            uniqueValues.statut_photo = js.photo_statuses || [];
+          }
+        } catch (e) {
+          console.error("Erreur chargement:", e);
+          showToast("Erreur chargement des filtres: " + e.message, 'danger');
+        } finally {
+          hideSpinner();
+        }
+      }
+      function toggleFilterDropdown(event, column, suffix = '') {
+        event.stopPropagation();
+        const menuId = `filterMenu_${column}${suffix}`;
+
+        // Close all other menus
+        document.querySelectorAll('.filter-menu').forEach(menu => {
+          if (menu.id !== menuId) { menu.classList.remove('is-visible'); }
+        });
+
+        const menu = document.getElementById(menuId);
+        const button = event.currentTarget;
+
+        // Populate menu content
+        menu.innerHTML = renderFilterMenu(column, suffix);
+
+        // Toggle visibility
+        const wasVisible = menu.classList.contains('is-visible');
+        menu.classList.toggle('is-visible');
+
+        if (!wasVisible) {
+          // Position the menu near the button
+          const buttonRect = button.getBoundingClientRect();
+
+          // Position below the button by default
+          let top = buttonRect.bottom + 5;
+          let left = buttonRect.left;
+
+          // Show menu temporarily to get its dimensions
+          menu.style.top = top + 'px';
+          menu.style.left = left + 'px';
+
+          // Check if menu goes off screen
+          const menuRect = menu.getBoundingClientRect();
+
+          // Adjust horizontal position if off screen
+          if (menuRect.right > window.innerWidth) {
+            left = window.innerWidth - menuRect.width - 10;
+          }
+
+          // Adjust vertical position if off screen (show above button instead)
+          if (menuRect.bottom > window.innerHeight) {
+            top = buttonRect.top - menuRect.height - 5;
+          }
+
+          // Apply final position
+          menu.style.top = top + 'px';
+          menu.style.left = left + 'px';
+        }
+      }
+      function renderFilterMenu(column, suffix = '') {
+        const values = uniqueValues[column] || [];
+        const selected = activeFilters[column];
+        const allChecked = selected.size === 0 || (values && selected.size === values.length);
+        const uniqueIdSuffix = `${column}${suffix}`;
+        let html = `<div class="d-flex justify-content-between align-items-center mb-2"><div class="form-check"><input class="form-check-input" type="checkbox" id="filterAll_${uniqueIdSuffix}" onchange="toggleAllFilters('${column}', this.checked, '${suffix}')" ${allChecked ? 'checked' : ''}><label class="form-check-label fw-bold" for="filterAll_${uniqueIdSuffix}">Tout sélectionner</label></div><button class="btn btn-sm btn-outline-secondary" onclick="resetFilters('${column}', '${suffix}')">Réinitialiser</button></div><div class="border-top pt-2">`;
+        if (values) {
+          html += values.map(v => `<div class="form-check"><input class="form-check-input" type="checkbox" value="${v}" id="filter_${uniqueIdSuffix}_${v.replace(/[^a-zA-Z0-9]/g, '_')}" onchange="updateFilters('${column}', '${suffix}')" ${selected.has(v) ? 'checked' : ''}><label class="form-check-label" for="filter_${uniqueIdSuffix}_${v.replace(/[^a-zA-Z0-9]/g, '_')}">${v || '<i>(Vide)</i>'}</label></div>`).join('');
+        }
+        html += `</div>`;
+        return html;
+      }
+      function toggleAllFilters(column, checked, suffix = '') {
+        document.querySelectorAll(`#filterMenu_${column}${suffix} .form-check-input[id^="filter_"]`).forEach(cb => { cb.checked = checked; });
+        updateFilters(column, suffix);
+      }
+      function updateFilters(column, suffix = '') {
+        const selected = activeFilters[column];
+        selected.clear();
+        document.querySelectorAll(`#filterMenu_${column}${suffix} input[type="checkbox"][id^="filter_"]:checked`).forEach(cb => { selected.add(cb.value); });
+        updateFilterCount(column, suffix);
+        loadData();
+      }
+      function resetAllFilters() {
+        Object.keys(activeFilters).forEach(key => activeFilters[key].clear());
+        updateFilterCount('demandeur');
+        updateFilterCount('demande');
+        updateFilterCount('statut_echantillon');
+        updateFilterCount('demandeur', '_ok');
+        updateFilterCount('demande', '_ok');
+        updateFilterCount('photographe_identifiant', '_ok');
+        updateFilterCount('demandeur', '_reader');
+        updateFilterCount('demande', '_reader');
+        updateFilterCount('statut_echantillon', '_reader');
+        updateFilterCount('statut_photo', '_reader');
+        updateFilterCount('photographe_identifiant', '_reader');
+      }
+      function resetFilters(column, suffix = '') {
+        activeFilters[column].clear();
+        updateFilterCount(column, suffix);
+        document.getElementById(`filterMenu_${column}${suffix}`).classList.remove('is-visible');
+        loadData();
+      }
+      function updateFilterCount(column, suffix = '') {
+        const icon = document.getElementById(`filterIcon_${column}${suffix}`);
+        if (!icon) return;
+        const count = activeFilters[column].size;
+        if (count > 0 && uniqueValues[column] && count < uniqueValues[column].length) {
+          icon.classList.add('active-filter');
+          icon.title = `${count} filtre(s) appliqué(s)`;
+        } else {
+          icon.classList.remove('active-filter');
+          icon.title = '';
+        }
+      }
+      function handleSearch() {
+        applyFiltersAndRender();
+      }
+      function applySearch() { applyFiltersAndRender(); } // Alias for compatibility
+      function sortBy(key) {
+        if (sortKey === key) {
+          sortAsc = !sortAsc;
+        } else {
+          sortKey = key;
+          sortAsc = true;
+        }
+        loadData();
+      }
+
+      // --- CHARGEMENT ET AFFICHAGE DES DONNÉES ---
+      async function loadData() {
+        showSpinner();
+
+        let endpoint = '';
+        const params = new URLSearchParams();
+        // const q = document.getElementById('search').value.trim(); // Client-side now
+        // if (q) params.append('q', q);
+
+        if (currentUser.role === 'lecteur') {
+          endpoint = 'api/get_all_products.php';
+          if (activeFilters.demandeur.size > 0 && activeFilters.demandeur.size < uniqueValues.demandeur.length) params.append('demandeurs', [...activeFilters.demandeur].join(','));
+          if (activeFilters.demande.size > 0 && activeFilters.demande.size < uniqueValues.demande.length) params.append('demandes', [...activeFilters.demande].join(','));
+          if (activeFilters.statut_echantillon.size > 0 && activeFilters.statut_echantillon.size < uniqueValues.statut_echantillon.length) params.append('statuses', [...activeFilters.statut_echantillon].join(','));
+          if (activeFilters.statut_photo.size > 0 && activeFilters.statut_photo.size < uniqueValues.statut_photo.length) params.append('photo_statuses', [...activeFilters.statut_photo].join(','));
+          if (activeFilters.photographe_identifiant.size > 0 && activeFilters.photographe_identifiant.size < uniqueValues.photographe_identifiant.length) params.append('photographers', [...activeFilters.photographe_identifiant].join(','));
+        } else {
+          endpoint = 'api/get_products.php';
+          params.append('tab', currentTab);
+          if (activeFilters.demandeur.size > 0 && activeFilters.demandeur.size < uniqueValues.demandeur.length) params.append('demandeurs', [...activeFilters.demandeur].join(','));
+          if (activeFilters.demande.size > 0 && activeFilters.demande.size < uniqueValues.demande.length) params.append('demandes', [...activeFilters.demande].join(','));
+          if (currentTab === 'shooter' && activeFilters.statut_echantillon.size > 0 && activeFilters.statut_echantillon.size < uniqueValues.statut_echantillon.length) params.append('statuses', [...activeFilters.statut_echantillon].join(','));
+          if (currentTab === 'ok' && activeFilters.photographe_identifiant.size > 0 && activeFilters.photographe_identifiant.size < uniqueValues.photographe_identifiant.length) params.append('photographers', [...activeFilters.photographe_identifiant].join(','));
+        }
+
+        if (sortKey) {
+          params.append('sort', sortKey);
+          params.append('order', sortAsc ? 'ASC' : 'DESC');
+        }
+
+        try {
+          const js = await fetchJSON(`${endpoint}?${params.toString()}`);
+          fullTabRows = js.rows || [];
+
+          // Logique de filtres dynamiques (basée sur la réponse complète)
+          uniqueValues.demandeur = [...new Set(fullTabRows.map(r => r.demandeur || '(Vide)'))].sort();
+          uniqueValues.demande = [...new Set(fullTabRows.map(r => r.demande || '(Vide)'))].sort();
+          uniqueValues.statut_echantillon = [...new Set(fullTabRows.map(r => r.statut_echantillon || '(Vide)'))].sort();
+          uniqueValues.statut_photo = [...new Set(fullTabRows.map(r => r.statut_photo || '(Vide)'))].sort();
+          uniqueValues.photographe_identifiant = [...new Set(fullTabRows.map(r => r.photographe_identifiant || '(Vide)'))].sort();
+
+          applyFiltersAndRender();
+        } catch (e) {
+          console.error(e.message);
+          showToast("Erreur de chargement: " + e.message, 'danger');
+        } finally {
+          hideSpinner();
+        }
+      }
+
+      function applyFiltersAndRender() {
+        let rowsToRender = [...fullTabRows];
+
+        // 1. Client-side Search
+        const q = document.getElementById('search').value.trim().toLowerCase();
+        if (q) {
+          rowsToRender = rowsToRender.filter(r => {
+            const code = (r.code_produit || '').toString().toLowerCase();
+            const des = (r.designation || '').toString().toLowerCase();
+            const demd = (r.demandeur || '').toString().toLowerCase();
+            const dem = (r.demande || '').toString().toLowerCase();
+            return code.includes(q) || des.includes(q) || demd.includes(q) || dem.includes(q);
+          });
+        }
+
+        if (activeFilters.demande.size > 0) {
+          rowsToRender = rowsToRender.filter(r => activeFilters.demande.has(r.demande || '(Vide)'));
+        }
+        if (activeFilters.demandeur.size > 0) {
+          rowsToRender = rowsToRender.filter(r => activeFilters.demandeur.has(r.demandeur || '(Vide)'));
+        }
+        if (activeFilters.statut_echantillon.size > 0) {
+          rowsToRender = rowsToRender.filter(r => activeFilters.statut_echantillon.has(r.statut_echantillon || '(Vide)'));
+        }
+        if (activeFilters.statut_photo.size > 0) {
+          rowsToRender = rowsToRender.filter(r => activeFilters.statut_photo.has(r.statut_photo || '(Vide)'));
+        }
+        if (activeFilters.photographe_identifiant.size > 0) {
+          rowsToRender = rowsToRender.filter(r => activeFilters.photographe_identifiant.has(r.photographe_identifiant));
+        }
+
+        render(rowsToRender);
+      }
+
+      function render(rows) {
+        lastRows = rows;
+        // Le tri est géré par le backend (via loadData), on affiche juste.
+
+        if (currentTab === 'requester') {
+          renderRequester(rows);
+        } else if (currentUser.role === 'lecteur') {
+          renderReader(rows);
+        } else if (currentTab === 'shooter') {
+          renderShooter(rows);
+        } else {
+          renderOk(rows);
+        }
+        updateSortIcons();
+      }
+
+      function updateSortIcons() {
+        const getCurrentPanelId = () => {
+          if (currentUser.role === 'lecteur') return '#panelReader';
+          if (!currentTab || currentTab === 'addlist' || currentTab === 'admin') return null;
+          return currentTab === 'shooter' ? '#panelShooter' : '#panelOk';
+        };
+        const panelId = getCurrentPanelId();
+        if (!panelId) return;
+
+        document.querySelectorAll(`${panelId} thead th i`).forEach(i => {
+          i.classList.remove('bi-sort-up', 'bi-sort-down');
+          i.classList.add('bi-arrow-down-up');
+        });
+
+        if (sortKey) {
+          const th = document.querySelector(`${panelId} thead th[onclick="sortBy('${sortKey}')"]`);
+          if (th) {
+            const icon = th.querySelector('i');
+            if (icon) {
+              icon.classList.remove('bi-arrow-down-up');
+              icon.classList.add(sortAsc ? 'bi-sort-up' : 'bi-sort-down');
+            }
+          }
+        }
+      }
+      function copyToClipboard(text) {
+        // Méthode 1 : L'API moderne et sécurisée (préférée)
+        // On vérifie si le navigateur la supporte ET si le contexte est sécurisé
+        if (navigator.clipboard && window.isSecureContext) {
+          navigator.clipboard.writeText(text).then(() => {
+            showToast(`"${text}" copié !`, 'success');
+          }).catch(err => {
+            console.error('Erreur lors de la copie (API moderne) : ', err);
+            showToast('Impossible de copier le code.', 'danger');
+          });
+        } else {
+          // Méthode 2 : La méthode de secours "legacy" (pour HTTP et anciens navigateurs)
+          const textArea = document.createElement('textarea');
+          textArea.value = text;
+
+          // Rend le textarea invisible et l'ajoute au corps de la page
+          textArea.style.position = 'fixed';
+          textArea.style.top = '-9999px';
+          textArea.style.left = '-9999px';
+          document.body.appendChild(textArea);
+
+          // Sélectionne le contenu et exécute la commande de copie
+          textArea.focus();
+          textArea.select();
+          try {
+            document.execCommand('copy');
+            showToast(`"${text}" copié !`, 'success');
+          } catch (err) {
+            console.error('Erreur lors de la copie (méthode legacy) : ', err);
+            showToast('Impossible de copier le code.', 'danger');
+          }
+
+          // Retire le textarea de la page
+          document.body.removeChild(textArea);
+        }
+      }
+      // AJOUTEZ CETTE FONCTION (par ex. vers la ligne 2030)
+
+      async function exportData() {
+        // 1. Vérifie s'il y a des données à exporter
+        if (!lastRows || lastRows.length === 0) {
+          showToast("Aucune donnée à exporter.", "warning");
+          return;
+        }
+
+        let headers = [];
+        let data = [];
+        let filename = "export_phototracker.xlsx";
+
+        // 2. Détermine les colonnes en fonction de l'onglet actif ou du rôle
+        if (currentUser.role === 'lecteur') {
+          filename = "export_phototracker_complet.xlsx";
+          headers = ["Code", "Désignation", "Demandeur", "Demande", "Statut Échantillon", "Statut Photo", "Deadline", "Date Photo OK", "Opérateur"];
+          data = lastRows.map(r => [
+            r.code_produit || '',
+            r.designation || '',
+            r.demandeur || '',
+            r.demande || '',
+            r.statut_echantillon || '',
+            r.statut_photo || '',
+            formatFR(r.deadline),
+            formatFRDT(r.date_photo_ok),
+            r.photographe_identifiant || ''
+          ]);
+
+        } else if (currentTab === 'shooter') {
+          filename = "export_a_shooter.xlsx";
+          headers = ["Code", "Désignation", "Demandeur", "Demande", "Statut échantillon", "Deadline"];
+          data = lastRows.map(r => [
+            r.code_produit || '',
+            r.designation || '',
+            r.demandeur || '',
+            r.demande || '',
+            r.statut_echantillon || '',
+            formatFR(r.deadline)
+          ]);
+
+        } else if (currentTab === 'ok') {
+          filename = "export_photo_ok.xlsx";
+          headers = ["Code", "Désignation", "Demandeur", "Demande", "Nb vues", "Date Photo OK", "Opérateur"];
+          data = lastRows.map(r => [
+            r.code_produit || '',
+            r.designation || '',
+            r.demandeur || '',
+            r.demande || '',
+            r.nb_vues || 0,
+            formatFRDT(r.date_photo_ok),
+            r.photographe_identifiant || ''
+          ]);
+
+        } else {
+          // Ne fait rien sur les onglets Admin ou Ajout
+          showToast("Export non disponible sur cet onglet.", "info");
+          return;
+        }
+
+        try {
+          // 3. Crée la feuille de calcul
+          const ws = XLSX.utils.aoa_to_sheet([headers, ...data]);
+
+          // Optionnel : Ajuster la largeur des colonnes
+          const colsWidth = headers.map((_, i) => ({
+            wch: Math.max(...data.map(row => row[i] ? row[i].toString().length : 10), headers[i].length) + 2
+          }));
+          ws['!cols'] = colsWidth;
+
+          // 4. Crée le classeur et déclenche le téléchargement
+          const wb = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(wb, ws, "Export");
+          XLSX.writeFile(wb, filename);
+
+        } catch (e) {
+          console.error("Erreur lors de la génération de l'Excel:", e);
+          showToast("Erreur lors de la génération de l'Excel.", "danger");
+        }
+      }
+      // MODIFICATION (vers la ligne 1546)
+      function renderShooter(rows) {
+        const body = document.getElementById('bodyShooter');
+        const canSelectRows = currentUser.role === 'assistante' || currentUser.role === 'admin';
+
+        if (rows.length === 0) {
+          body.innerHTML = `<tr><td colspan="8" class="text-center text-muted p-4">Aucun produit à afficher.</td></tr>`;
+          return;
+        }
+
+        body.innerHTML = rows.map(r => {
+          const deadlineDate = r.deadline ? new Date(r.deadline) : null;
+          const today = new Date(); today.setHours(0, 0, 0, 0);
+          const isStatusShooter = (r.statut_photo === 'à shooter' || r.statut_photo === 'à reshooter');
+          const isOverdue = isStatusShooter && deadlineDate && deadlineDate < today;
+
+          // --- NETTOYAGE DU CODE ---
+          // On utilise la fonction pour afficher "642203" au lieu de "642203_1"
+          let codeDisplay = formatDisplayCode(r.code_produit);
+
+          // Gestion du badge Reshoot
+          let rowClass = isOverdue ? 'table-danger' : '';
+          const isReshoot = (r.statut_photo === 'à reshooter') || (r.reshoot_reason && r.reshoot_reason !== '');
+
+          if (isReshoot) {
+            const safeReason = (r.reshoot_reason || '').replace(/"/g, '&quot;');
+            codeDisplay += ` <span class="badge bg-warning text-dark ms-1" data-bs-toggle="tooltip" title="${safeReason}">
+                                <i class="bi bi-arrow-repeat"></i> Reshoot
+                             </span>`;
+            if (!isOverdue) rowClass = 'table-warning';
+          }
+
+          // Gestion du badge Relancé (ou commentaire présent)
+          if (r.relance_comment) {
+            const safeRelance = (r.relance_comment || '').replace(/"/g, '&quot;');
+            codeDisplay += ` <span class="badge badge-relance ms-1" data-bs-toggle="tooltip" title="${safeRelance}">
+                                <i class="bi bi-chat-text"></i>
+                             </span>`;
+          }
+
+          // Pour les actions techniques, on garde le VRAI code (avec _1) pour éviter les conflits de fichiers
+          const safeCode = (r.code_produit || '').replace(/'/g, "\\'");
+
+          let actionsHTML = '';
+          if (currentUser.role === 'photographe') {
+            actionsHTML = `<button class="btn btn-sm btn-outline-secondary" onclick="copyToClipboard('${safeCode}')" title="Copier nom de fichier"><i class="bi bi-clipboard"></i></button> <button class="btn btn-sm btn-success btn-photo-ok" onclick="openOk(${r.id}, '${safeCode}')"><i class="bi bi-check2-circle"></i> Photo OK</button>`;
+          } else if (currentUser.role === 'retoucheur') {
+            actionsHTML = `<button class="btn btn-sm btn-outline-secondary" onclick="copyToClipboard('${safeCode}')"><i class="bi bi-clipboard"></i></button> <button class="btn btn-sm btn-primary" onclick="confirmRetoucheurOk(${r.id})"><i class="bi bi-check2-circle"></i> Photo OK</button> <button class="btn btn-sm btn-outline-danger" onclick="rejectRetouche(${r.id}, '${safeCode}')"><i class="bi bi-x-lg"></i></button>`;
+          }
+
+          if (canSelectRows) {
+            actionsHTML += ` <button class="btn btn-sm btn-outline-primary" onclick="editLine(${r.id})"><i class="bi bi-pencil"></i></button> <button class="btn btn-sm btn-outline-danger" onclick="delLine(${r.id})"><i class="bi bi-x-lg"></i></button>`;
+          }
+
+          const isChecked = selectedIds.has(r.id);
+          const checkboxCellHTML = canSelectRows ? `<td class="text-center"><input type="checkbox" class="row-checkbox" data-id="${r.id}" onchange="toggleRow(${r.id}, this.checked)" ${isChecked ? 'checked' : ''}></td>` : '';
+
+          return `<tr data-id="${r.id}" class="${rowClass}">
+            ${checkboxCellHTML}
+            <td class="text-nowrap">${codeDisplay}</td>
+            <td>${r.designation || ''}</td>
+            <td>${r.demandeur || ''}</td>
+            <td>${r.demande || ''}</td>
+            <td>${badgeStatut(r.statut_echantillon)}</td>
+            <td class="text-nowrap">${formatFR(r.deadline)}</td>
+            <td class="text-nowrap">${actionsHTML}</td>
+        </tr>`;
+        }).join('');
+
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function (tooltipTriggerEl) { return new bootstrap.Tooltip(tooltipTriggerEl); });
+      }
+
+      // Les fonctions pour la modale (à ajouter aussi)
+      function openReshootModal(id, code) {
+        document.getElementById('reshootId').value = id;
+        document.getElementById('reshootReason').value = '';
+        document.querySelector('#modalReshoot .modal-title').textContent = 'Reshoot : ' + code;
+        reshootModal = new bootstrap.Modal('#modalReshoot'); // Assure-toi que reshootModal est déclaré globalement en haut
+        reshootModal.show();
+      }
+
+      async function confirmReshoot() {
+        const id = document.getElementById('reshootId').value;
+        const reason = document.getElementById('reshootReason').value.trim();
+
+        if (!reason) { showToast("Le motif est obligatoire.", "warning"); return; }
+
+        showSpinner();
+        try {
+          await fetchJSON('api/reshoot_product.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id, reason })
+          });
+
+          // Fermer la modale
+          const modalEl = document.getElementById('modalReshoot');
+          const modal = bootstrap.Modal.getInstance(modalEl);
+          modal.hide();
+
+          showToast('Reshoot validé ! Le produit est maintenant dans "À shooter".', 'success');
+
+          // --- LA CORRECTION EST ICI ---
+          // On bascule automatiquement vers l'onglet "À shooter" pour voir le résultat
+          showShooter();
+
+        } catch (e) {
+          showToast('Erreur: ' + e.message, 'danger');
+        } finally {
+          hideSpinner();
+        }
+      }
+
+      function renderOk(rows) {
+        const body = document.getElementById('bodyOk');
+        if (rows.length === 0) {
+          body.innerHTML = '<tr><td colspan="8" class="text-center text-muted p-4">Aucun produit à afficher.</td></tr>';
+          return;
+        }
+
+        body.innerHTML = rows.map(r => {
+          const isPhotographe = currentUser.role === 'photographe';
+          const canEdit = currentUser.role === 'assistante' || currentUser.role === 'admin';
+          const nbVuesControl = `<div class="d-flex align-items-center justify-content-center" style="width: 100px;"><button class="btn btn-sm btn-outline-secondary" onclick="updateVues(${r.id}, -1)"><i class="bi bi-dash"></i></button><span id="nbVues_${r.id}" class="fw-bold mx-2" style="min-width: 20px; text-align: center;">${r.nb_vues || 0}</span><button class="btn btn-sm btn-outline-secondary" onclick="updateVues(${r.id}, 1)"><i class="bi bi-plus"></i></button></div>`;
+
+          // Le code technique pour les fonctions
+          const safeCode = (r.code_produit || '').replace(/'/g, "\\'");
+          // Le code propre pour l'affichage
+          const displayCode = formatDisplayCode(r.code_produit);
+
+          const actionsHTML = canEdit ? `<button class="btn btn-sm btn-outline-warning" onclick="openReshootModal(${r.id}, '${safeCode}')" title="Demander un reshoot"><i class="bi bi-arrow-counterclockwise"></i></button> <button class="btn btn-sm btn-outline-primary" onclick="editLine(${r.id})"><i class="bi bi-pencil"></i></button> <button class="btn btn-sm btn-outline-danger" onclick="delLine(${r.id})"><i class="bi bi-x-lg"></i></button>` : '';
+
+          // Ajout d'un style pour les produits reshootés (archivés)
+          let rowStyle = '';
+          let statutBadge = '';
+          if (r.statut_echantillon === 'Reshooté') {
+            rowStyle = 'opacity: 0.6; background-color: #f8f9fa;';
+            statutBadge = ' <span class="badge badge-reshoote ms-2">Archivé</span>';
+          }
+
+          const isChecked = selectedIds.has(r.id);
+          const checkboxCellHTML = canEdit ? `<td class="text-center"><input type="checkbox" class="row-checkbox" data-id="${r.id}" onchange="toggleRow(${r.id}, this.checked)" ${isChecked ? 'checked' : ''}></td>` : '';
+
+          return `<tr data-id="${r.id}" style="${rowStyle}">
+        ${checkboxCellHTML}
+        <td>${displayCode}${statutBadge}</td>
+        <td>${r.designation || ''}</td>
+        <td>${r.demandeur || ''}</td>
+        <td>${r.demande || ''}</td>
+        <td>${isPhotographe || canEdit ? nbVuesControl : r.nb_vues || ''}</td>
+        <td class="text-nowrap">${formatFRDT(r.date_photo_ok)}</td>
+        <td>${r.photographe_identifiant || ''}</td>
+        <td class="text-nowrap">${actionsHTML}</td>
+    </tr>`;
+        }).join('');
+      }
+
+      function renderRequester(rows) {
+        console.log('renderRequester called with', rows.length, 'rows');
+        const debugSpan = document.getElementById('debugRequesterCount');
+        if (debugSpan) debugSpan.textContent = rows.length + ' produits';
+
+        const container = document.getElementById('accordionRequester');
+        container.innerHTML = '';
+
+        if (rows.length === 0) {
+          container.innerHTML = '<div class="text-center text-muted p-4">Aucun produit à afficher.</div>';
+          return;
+        }
+
+        // Extract Years
+        const years = new Set();
+        rows.forEach(r => {
+          if (r.deadline) {
+            years.add(new Date(r.deadline).getFullYear());
+          }
+        });
+        const sortedYears = Array.from(years).sort((a, b) => b - a); // Descending
+
+        // Render Year Buttons
+        let yearButtons = `<button type="button" class="btn btn-sm ${requesterYearFilter === 'all' ? 'btn-secondary' : 'btn-outline-secondary'}" onclick="setRequesterYear('all')">Toutes</button>`;
+        sortedYears.forEach(year => {
+          yearButtons += `<button type="button" class="btn btn-sm ${requesterYearFilter === year.toString() ? 'btn-secondary' : 'btn-outline-secondary'}" onclick="setRequesterYear('${year}')">${year}</button>`;
+        });
+
+        const filterHtml = `
+        <div class="d-flex align-items-center mb-3">
+          <span class="me-2 small fw-bold text-muted">Année :</span>
+          <div class="btn-group btn-group-sm">
+            ${yearButtons}
+          </div>
+        </div>`;
+
+        container.innerHTML = filterHtml;
+
+        // Filter Rows by Year
+        const filteredRows = requesterYearFilter === 'all'
+          ? rows
+          : rows.filter(r => r.deadline && new Date(r.deadline).getFullYear().toString() === requesterYearFilter);
+
+        if (filteredRows.length === 0) {
+          container.insertAdjacentHTML('beforeend', '<div class="text-center text-muted p-4">Aucun produit pour cette année.</div>');
+          return;
+        }
+
+        // Group by Demandeur (UI: Demandeur)
+        const byDemandeur = {};
+        filteredRows.forEach(r => {
+          const type = r.demandeur || '(Sans Demandeur)';
+          if (!byDemandeur[type]) byDemandeur[type] = [];
+          byDemandeur[type].push(r);
+        });
+
+        // Create Accordion Items
+        Object.keys(byDemandeur).sort().forEach((type, index) => {
+          const items = byDemandeur[type];
+          const accordionId = `accItem_${index}`;
+          const collapseId = `collapse_${index}`;
+
+          // Group by Demande (UI: Demande) within this Demandeur
+          const byDemande = {};
+          items.forEach(r => {
+            const dem = r.demande || '(Sans Demande)';
+            if (!byDemande[dem]) byDemande[dem] = [];
+            byDemande[dem].push(r);
+          });
+
+          let contentHTML = '';
+          Object.keys(byDemande).sort().forEach(dem => {
+            const subItems = byDemande[dem];
+
+            // Calculate Stats for Demande
+            const total = subItems.length;
+            const shot = subItems.filter(r => r.statut_photo === 'photo ok').length;
+            const percent = total > 0 ? Math.round((shot / total) * 100) : 0;
+
+            // Status breakdown
+            const statusCounts = {};
+            subItems.forEach(r => {
+              const s = r.statut_echantillon || 'Non renseigné';
+              statusCounts[s] = (statusCounts[s] || 0) + 1;
+            });
+            let statusHtml = '';
+            Object.entries(statusCounts).forEach(([s, c]) => {
+              let badgeClass = 'bg-secondary';
+              if (s === 'Manquant') badgeClass = 'bg-danger';
+              else if (s === 'Reçu') badgeClass = 'bg-success';
+              else if (s === 'À renvoyer') badgeClass = 'bg-warning text-dark';
+              else if (s === 'À mettre DAM') badgeClass = 'bg-primary';
+              statusHtml += `<span class="badge ${badgeClass} me-1 mb-1" style="font-size: 0.7rem;">${s}: ${c}</span>`;
+            });
+
+            // Summary Card
+            contentHTML += `
+            <div class="col-md-6 col-lg-4 mb-3">
+              <div class="card h-100 border-0 shadow-sm hover-shadow transition-all" style="background-color: #fff; border-radius: 10px;">
+                <div class="card-body p-3">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h6 class="fw-bold text-primary mb-0 text-truncate" title="${dem}">
+                      <i class="bi bi-folder2 me-2"></i>${dem}
+                    </h6>
+                    <span class="badge bg-light text-dark border">${total} produits</span>
+                  </div>
+                  
+                  <div class="mb-3">
+                    <div class="d-flex justify-content-between small text-muted mb-1">
+                      <span>Progression</span>
+                      <span>${percent}%</span>
+                    </div>
+                    <div class="progress" style="height: 6px; border-radius: 3px;">
+                      <div class="progress-bar bg-success" role="progressbar" style="width: ${percent}%" aria-valuenow="${percent}" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                  </div>
+
+                  <div class="d-flex flex-wrap">
+                    ${statusHtml}
+                  </div>
+                </div>
+              </div>
+            </div>`;
+          });
+
+          // Wrap cards in a row
+          contentHTML = `<div class="row g-3">${contentHTML}</div>`;
+
+          const accordionItem = `
+          <div class="accordion-item mb-3 border shadow-sm overflow-hidden" style="border-radius: 8px;">
+            <h2 class="accordion-header" id="heading_${index}">
+              <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#${collapseId}" aria-expanded="false" aria-controls="${collapseId}" style="background-color: #fff;">
+                ${type} <span class="badge bg-primary rounded-pill ms-3">${items.length}</span>
+              </button>
+            </h2>
+            <div id="${collapseId}" class="accordion-collapse collapse" aria-labelledby="heading_${index}" data-bs-parent="#accordionRequester">
+              <div class="accordion-body bg-light p-3">
+                ${contentHTML}
+              </div>
+            </div>
+          </div>`;
+          container.insertAdjacentHTML('beforeend', accordionItem);
+        });
+      }
+
+      function renderReader(rows) {
+        const body = document.getElementById('bodyReader');
+        if (rows.length === 0) {
+          body.innerHTML = '<tr><td colspan="9" class="text-center text-muted p-4">Aucun produit à afficher.</td></tr>';
+          return;
+        }
+        body.innerHTML = rows.map(r => {
+          const deadlineDate = r.deadline ? new Date(r.deadline) : null;
+          const today = new Date(); today.setHours(0, 0, 0, 0);
+          const isOverdue = (r.statut_photo === 'à shooter' || r.statut_photo === 'à reshooter') && deadlineDate && deadlineDate < today;
+
+          // Nettoyage affichage
+          const displayCode = formatDisplayCode(r.code_produit);
+
+          return `<tr class="${isOverdue ? 'table-danger' : ''}">
+            <td>${displayCode}</td>
+            <td>${r.designation || ''}</td>
+            <td>${r.demandeur || ''}</td>
+            <td>${r.demande || ''}</td>
+            <td>${badgeStatut(r.statut_echantillon)}</td>
+            <td><span class="badge ${r.statut_photo === 'photo ok' ? 'bg-success' : 'bg-warning text-dark'}">${r.statut_photo}</span></td>
+            <td class="text-nowrap">${formatFR(r.deadline)}</td>
+            <td class="text-nowrap">${formatFRDT(r.date_photo_ok)}</td>
+            <td>${r.photographe_identifiant || ''}</td>
+        </tr>`;
+        }).join('');
+      }
+      function copySelectedCodes() {
+        if (selectedIds.size === 0) { showToast("Veuillez sélectionner des produits.", "warning"); return; }
+        const selectedCodes = lastRows.filter(row => selectedIds.has(row.id)).map(row => row.code_produit);
+        const textToCopy = selectedCodes.join('\n');
+        if (!navigator.clipboard) { showToast('Copie non supportée.', 'warning'); return; }
+        navigator.clipboard.writeText(textToCopy).then(() => {
+          showToast(`${selectedCodes.length} code(s) copié(s) !`, 'success');
+        }).catch(err => {
+          showToast('Impossible de copier.', 'danger');
+        });
+      }
+      async function updateVues(id, change) {
+        const spanElement = document.getElementById(`nbVues_${id}`);
+        if (spanElement) {
+          let currentValue = parseInt(spanElement.textContent, 10) || 0;
+          let newValue = Math.max(0, currentValue + change);
+          spanElement.textContent = newValue;
+          showSpinner();
+          try {
+            await saveVuesDirect(id, newValue);
+          } catch (e) {
+            spanElement.textContent = currentValue;
+          } finally {
+            hideSpinner();
+          }
+        }
+      }
+      async function saveVuesDirect(id, nb_vues) {
+        try {
+          const js = await fetchJSON('api/update_product.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id, nb_vues })
+          });
+          if (js.success) {
+            showToast('Nombre de vues mis à jour.', 'success');
+          }
+        } catch (e) {
+          showToast('Erreur: ' + e.message, 'danger');
+          throw e;
+        }
+      }
+      async function saveOkInline(id) {
+        const payload = {
+          id: id,
+          designation: document.getElementById(`e_des_${id}`).value.trim(),
+          demandeur: document.getElementById(`e_demandeur_${id}`).value.trim(),
+          demande: document.getElementById(`e_demande_${id}`).value.trim()
+        };
+        showSpinner();
+        try {
+          await fetchJSON('api/update_product.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+          showToast('Ligne mise à jour.', 'success');
+          await loadData();
+        } catch (e) {
+          showToast('Erreur: ' + e.message, 'danger');
+        } finally {
+          hideSpinner();
+        }
+      }
+
+      function toggleRow(id, checked) { if (checked) selectedIds.add(id); else selectedIds.delete(id); updateActionsBar(); }
+      function toggleAllVisibleSelection(headerCheckbox) {
+        const isChecked = headerCheckbox.checked;
+        let selector = '#bodyShooter .row-checkbox';
+        if (currentTab === 'ok') {
+          selector = '#bodyOk .row-checkbox';
+        }
+        document.querySelectorAll(selector).forEach(cb => {
+          cb.checked = isChecked;
+          toggleRow(parseInt(cb.dataset.id), isChecked);
+        });
+      }
+      function deselectAll() {
+        document.querySelectorAll('.row-checkbox:checked').forEach(cb => cb.checked = false);
+        selectedIds.clear();
+        updateActionsBar();
+      }
+      function updateActionsBar() {
+        const cnt = selectedIds.size;
+        const bar = document.getElementById('bulkActionsBar');
+        const selCountEl = document.getElementById('selCount'); // <-- LIGNE AJOUTÉE
+        if (cnt > 0) {
+          bar.classList.add('d-none', false); // Remove d-none
+          bar.classList.add('is-visible'); // Keep custom class if needed
+          bar.classList.remove('d-none');
+          selCountEl.textContent = `${cnt} sélectionné(s)`; // <-- LIGNE AJOUTÉE
+        } else {
+          bar.classList.add('d-none');
+          bar.classList.remove('is-visible');
+        }
+      }
+
+      function openBulkModal(action) {
+        currentBulkAction = action;
+        const count = selectedIds.size;
+        switch (action) {
+          case 'change_status':
+            bulkStatusModal.show();
+            break;
+          case 'change_demandeur':
+            document.getElementById('bulkDemandeurInput').value = '';
+            bulkDemandeurModal.show();
+            break;
+          case 'change_demande':
+            document.getElementById('bulkDemandeInput').value = '';
+            bulkDemandeModal.show();
+            break;
+          case 'change_deadline':
+            document.getElementById('bulkDeadlineInput').value = '';
+            bulkDeadlineModal.show();
+            break;
+          case 'delete':
+            document.getElementById('confirmTitle').textContent = "Confirmation de suppression";
+            document.getElementById('confirmMessage').textContent = `Êtes-vous sûr de vouloir supprimer définitivement ${count} produit(s) ? Cette action est irréversible.`;
+            confirmModal.show();
+            break;
+        }
+      }
+      async function confirmBulkAction() {
+        const payload = {
+          action: currentBulkAction,
+          ids: [...selectedIds]
+        };
+        switch (currentBulkAction) {
+          case 'change_status':
+            payload.value = document.getElementById('bulkStatusSelect').value;
+            bulkStatusModal.hide();
+            break;
+          case 'change_demandeur':
+            payload.value = document.getElementById('bulkDemandeurInput').value.trim();
+            if (!payload.value) { showToast('Veuillez renseigner un demandeur.', 'warning'); return; }
+            bulkDemandeurModal.hide();
+            break;
+          case 'change_demande':
+            payload.value = document.getElementById('bulkDemandeInput').value.trim();
+            if (!payload.value) { showToast('Veuillez renseigner une demande.', 'warning'); return; }
+            bulkDemandeModal.hide();
+            break;
+          case 'change_deadline':
+            payload.value = document.getElementById('bulkDeadlineInput').value;
+            if (!payload.value) { showToast('Veuillez renseigner une deadline.', 'warning'); return; }
+            bulkDeadlineModal.hide();
+            break;
+          case 'delete':
+            confirmModal.hide();
+            break;
+        }
+        showSpinner();
+        try {
+          const js = await fetchJSON('api/bulk_actions.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          showToast(`${js.affected} ligne(s) mise(s) à jour.`, 'success');
+          deselectAll();
+          await loadData();
+        } catch (e) {
+          showToast('Erreur critique: ' + e.message, 'danger');
+        } finally {
+          hideSpinner();
+        }
+      }
+
+      function openOk(id, code) {
+        document.getElementById('okProductId').value = id;
+        document.getElementById('okVues').value = ''; // Réinitialise la valeur
+        document.getElementById('okTitle').textContent = 'Photo OK — ' + code;
+        document.querySelectorAll('#okBtnGroup .btn, #btnOtherVues').forEach(btn => btn.classList.remove('active'));
+        document.getElementById('okOtherInputContainer').classList.add('d-none');
+        document.getElementById('okOtherInput').value = '';
+        okModal.show();
+      }
+      function selectVues(nb) {
+        document.getElementById('okVues').value = nb;
+        document.querySelectorAll('#okBtnGroup .btn').forEach((btn, index) => {
+          btn.classList.toggle('active', (index + 1) === nb);
+        });
+        document.getElementById('btnOtherVues').classList.remove('active');
+        document.getElementById('okOtherInputContainer').classList.add('d-none');
+      }
+      function selectOtherVues() {
+        document.getElementById('okVues').value = '';
+        document.querySelectorAll('#okBtnGroup .btn').forEach(btn => btn.classList.remove('active'));
+        document.getElementById('btnOtherVues').classList.add('active');
+        const otherInputContainer = document.getElementById('okOtherInputContainer');
+        otherInputContainer.classList.remove('d-none');
+        document.getElementById('okOtherInput').focus();
+      }
+      async function confirmOk() {
+        const id = parseInt(document.getElementById('okProductId').value, 10);
+        let nb = 0;
+        if (document.getElementById('btnOtherVues').classList.contains('active')) {
+          nb = parseInt(document.getElementById('okOtherInput').value, 10);
+        } else {
+          nb = parseInt(document.getElementById('okVues').value, 10);
+        }
+        if (!nb || nb <= 0) {
+          showToast("Nombre de vues invalide", "warning");
+          return;
+        }
+        showSpinner();
+        try {
+          await fetchJSON('api/mark_ok.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ productId: id, nb_vues: nb })
+          });
+          okModal.hide();
+          showToast('Produit marqué "Photo OK" avec succès.', 'success');
+          showShooter();
+        } catch (e) {
+          showToast('Erreur: ' + e.message, 'danger');
+        } finally {
+          hideSpinner();
+        }
+      }
+      async function confirmRetoucheurOk(id) {
+        showSpinner();
+        try {
+          await fetchJSON('api/retoucheur_mark_ok.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ productId: id })
+          });
+          showToast('Produit marqué "Photo OK" avec succès.', 'success');
+          playSound('api/applause.wav');
+          await loadData();
+        } catch (e) {
+          showToast('Erreur: ' + e.message, 'danger');
+        } finally {
+          hideSpinner();
+        }
+      }
+      function playSound(soundFile) {
+        const audio = new Audio(soundFile);
+        audio.play().catch(error => {
+          console.warn("La lecture du son a été bloquée par le navigateur :", error);
+        });
+      }
+      async function rejectRetouche(id, code) {
+        if (!confirm(`Êtes-vous sûr de vouloir renvoyer le produit "${code}" au statut "À venir" ?`)) {
+          return;
+        }
+        showSpinner();
+        try {
+          await fetchJSON('api/update_product.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              id: id,
+              statut_echantillon: 'À venir'
+            })
+          });
+          showToast('Produit renvoyé à "À venir".', 'success');
+          await loadData();
+        } catch (e) {
+          showToast('Erreur: ' + e.message, 'danger');
+        } finally {
+          hideSpinner();
+        }
+      }
+      function openRelance() { relanceModal.show(); }
+      function confirmRelance() {
+        const to = document.getElementById('relanceTo').value.trim();
+        if (!to) { showToast('Renseignez un destinataire.', 'warning'); return; }
+        const selRows = [...selectedIds].map(id => lastRows.find(r => r.id == id)).filter(Boolean);
+        if (selRows.length === 0) { showToast('Aucune ligne sélectionnée.', 'warning'); return; }
+        const subject = encodeURIComponent('Relance mise à disposition produits pour shooting');
+        const lines = selRows.map(r => `• ${r.code_produit} — ${r.designation || ''}`);
+        const body = encodeURIComponent(`Bonjour,\nPouvez-vous nous confirmer la mise à disposition des produits suivants pour shooting ?\n\n${lines.join('\n')}\n\nMerci beaucoup,\n`);
+        const href = `mailto:${encodeURIComponent(to)}?subject=${subject}&body=${body}`;
+        window.location.href = href;
+        relanceModal.hide();
+      }// --- IMPORTATION DE FICHIERS ---
+      async function startImport() {
+        const fileInput = document.getElementById('importFile');
+        const file = fileInput.files[0];
+        if (!file) { showToast("Veuillez sélectionner un fichier.", "warning"); return; }
+
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, { type: 'array' });
+          const firstSheetName = workbook.SheetNames[0];
+          const worksheet = workbook.Sheets[firstSheetName];
+          const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+          if (jsonData.length < 2) { showToast("Fichier vide ou invalide.", "warning"); return; } const
+            header = jsonData[0].map(h => (h || '').toString().trim().toLowerCase());
+          const required = ['code_produit', 'designation', 'demandeur', 'demande', 'statut_echantillon', 'deadline'];
+          const missing = required.filter(r => !header.includes(r));
+          if (missing.length > 0) { showToast("Colonnes manquantes: " + missing.join(', '), "danger"); return; }
+
+          const rows = jsonData.slice(1).map(row => {
+            let obj = {};
+            header.forEach((h, i) => { obj[h] = row[i]; });
+            return obj;
+          }).filter(r => r.code_produit);
+
+          if (rows.length === 0) { showToast("Aucune donnée valide trouvée.", "warning"); return; }
+
+          showSpinner();
+          try {
+            const res = await fetchJSON('api/import_rows.php', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ rows: rows })
+            });
+
+            // Affichage du rapport détaillé
+            document.getElementById('insertedCount').textContent = res.inserted_rows.length;
+            document.getElementById('alreadyShooterCount').textContent = res.already_shooter.length;
+            document.getElementById('alreadyOkCount').textContent = res.already_ok.length;
+
+            const fillTable = (id, list) => {
+              const tbody = document.getElementById(id);
+              tbody.innerHTML = list.slice(0, 100).map(item => `<tr>
+        <td>${item.code_produit}</td>
+        <td>${item.designation || ''}</td>
+    </tr>`).join('');
+              if (list.length > 100) tbody.innerHTML += `<tr>
+        <td colspan="2" class="text-center text-muted">... et ${list.length - 100} autres</td>
+    </tr>`;
+
+              // Masquer la section si vide
+              const sectionId = id.replace('Body', 'Section');
+              document.getElementById(sectionId).classList.toggle('d-none', list.length === 0);
+            };
+
+            fillTable('insertedBody', res.inserted_rows);
+            fillTable('alreadyShooterBody', res.already_shooter);
+            fillTable('alreadyOkBody', res.already_ok);
+
+            importReportModal.show();
+            fileInput.value = ''; // Reset input
+            await loadData(); // Refresh data
+
+          } catch (e) {
+            showToast('Erreur import: ' + e.message, 'danger');
+          } finally {
+            hideSpinner();
+          }
+        };
+        reader.readAsArrayBuffer(file);
+      }
+
+      async function startUpdateImport() {
+        const fileInput = document.getElementById('updateImportFile');
+        const file = fileInput.files[0];
+        if (!file) { showToast("Veuillez sélectionner un fichier.", "warning"); return; }
+
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, { type: 'array' });
+          const firstSheetName = workbook.SheetNames[0];
+          const worksheet = workbook.Sheets[firstSheetName];
+          const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+          if (jsonData.length < 2) { showToast("Fichier vide ou invalide.", "warning"); return; } const
+            header = jsonData[0].map(h => (h || '').toString().trim().toLowerCase());
+          // Colonnes attendues pour la mise à jour
+          const required = ['code_produit', 'demandeur', 'demande', 'deadline', 'reshoot reason'];
+          const missing = required.filter(r => !header.includes(r));
+
+          if (missing.length > 0) { showToast("Colonnes manquantes: " + missing.join(', '), "danger"); return; }
+
+          const rows = jsonData.slice(1).map(row => {
+            let obj = {};
+            header.forEach((h, i) => { obj[h] = row[i]; });
+            return obj;
+          }).filter(r => r.code_produit);
+
+          if (rows.length === 0) { showToast("Aucune donnée valide trouvée.", "warning"); return; }
+
+          showSpinner();
+          try {
+            const res = await fetchJSON('api/import_reshoot_list.php', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ rows: rows })
+            });
+
+            let msg = `<div class="alert alert-success">Import terminé !<br>
+            Mis à jour : <strong>${res.updated_count}</strong><br>
+            Ignorés (non trouvés) : <strong>${res.not_found_count}</strong></div>`;
+
+            if (res.errors && res.errors.length > 0) {
+              msg += `<div class="alert alert-warning" style="max-height: 200px; overflow-y: auto;">
+            <strong>Erreurs :</strong><br>${res.errors.join('<br>')}
+        </div>`;
+            }
+
+            document.getElementById('updateImportMsg').innerHTML = msg;
+            fileInput.value = ''; // Reset input
+
+          } catch (e) {
+            document.getElementById('updateImportMsg').innerHTML = `<div class="alert alert-danger">Erreur import:
+            ${e.message}</div>`;
+          } finally {
+            hideSpinner();
+          }
+        };
+        reader.readAsArrayBuffer(file);
+      }
+
+      // --- STATISTIQUES ---
+      async function loadCharts() {
+        showSpinner();
+        try {
+          const from = document.getElementById('adminFrom').value;
+          const to = document.getElementById('adminTo').value;
+          const params = new URLSearchParams();
+          if (from) params.append('from', from);
+          if (to) params.append('to', to);
+
+          const js = await fetchJSON(`api/stats.php?${params.toString()}`);
+
+          // KPI
+          document.getElementById('kpiTotal').textContent = js.kpi.total_a_shooter || 0;
+          document.getElementById('kpiManquant').textContent = js.kpi.echantillon_manquant || 0;
+          document.getElementById('kpiRetard').textContent = js.kpi.retard || 0;
+          document.getElementById('kpiDam').textContent = js.kpi.a_mettre_dam || 0;
+
+          document.getElementById('kpiProduitsJour').textContent = js.kpi.produits_shootes_periode || 0;
+          document.getElementById('kpiJour').textContent = js.kpi.vues_periode || 0;
+          document.getElementById('kpiStephanie').textContent = js.kpi.total_stephanie || 0;
+
+          // Graphiques
+          renderChart('chartByDate', 'bar', js.charts.by_date, 'Vues par jour', '#10b981');
+          renderChart('chartByPhotographer', 'doughnut', js.charts.by_photographer, 'Photos par photographe');
+          renderChart('chartByStatus', 'pie', js.charts.by_status, 'Répartition Backlog');
+          renderChart('chartRemainingByType', 'bar', js.charts.remaining_by_type, 'Reste à shooter par Demandeur',
+            '#6366f1');
+          renderChart('chartByRetoucheur', 'bar', js.charts.by_retoucheur, 'Codes traités (Retouche)', '#f59e0b');
+
+        } catch (e) {
+          console.error(e);
+          showToast("Erreur chargement stats", "danger");
+        } finally {
+          hideSpinner();
+        }
+      }
+
+      function renderChart(canvasId, type, dataObj, label, color) {
+        const canvas = document.getElementById(canvasId);
+        const container = document.getElementById(canvasId + 'Container');
+
+        if (!canvas || !container) {
+          console.warn(`Canvas or Container not found for ${canvasId}`);
+          return;
+        }
+
+        const ctx = canvas.getContext('2d');
+        const emptyMsg = container.querySelector('.chart-empty-message');
+
+        // Détruire l'ancien graphique s'il existe
+        if (window[canvasId] instanceof Chart) {
+          window[canvasId].destroy();
+        }
+
+        // Vérifier s'il y a des données
+        const labels = Object.keys(dataObj || {});
+        const data = Object.values(dataObj || {});
+        const hasData = data.length > 0 && data.some(v => v > 0);
+
+        if (!hasData) {
+          emptyMsg.classList.remove('d-none');
+          return;
+        } else {
+          emptyMsg.classList.add('d-none');
+        }
+
+        const config = {
+          type: type,
+          data: {
+            labels: labels,
+            datasets: [{
+              label: label,
+              data: data,
+              backgroundColor: type === 'bar' ? (color || '#3b82f6') : ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6',
+                '#ec4899', '#6366f1'],
+              borderWidth: 1
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: type !== 'bar' },
+              datalabels: {
+                color: '#fff',
+                font: { weight: 'bold' },
+                formatter: (value) => value > 0 ? value : ''
+              }
+            }
+          },
+          plugins: [ChartDataLabels]
+        };
+
+        window[canvasId] = new Chart(ctx, config);
+      }
+
+      function setPresetDate(preset) {
+        const today = new Date();
+        const formatDate = (d) => d.toISOString().split('T')[0];
+
+        document.getElementById('adminTo').value = formatDate(today);
+
+        let fromDate = new Date();
+        if (preset === '7d') {
+          fromDate.setDate(today.getDate() - 7);
+        } else if (preset === '30d') {
+          fromDate.setDate(today.getDate() - 30);
+        } else if (preset === 'this_month') {
+          fromDate.setDate(1);
+        }
+        document.getElementById('adminFrom').value = formatDate(fromDate);
+        loadCharts();
+      }
+
+      async function generateMonthlyReport() {
+        const monthStr = document.getElementById('reportMonth').value; // YYYY-MM
+        if (!monthStr) { showToast("Veuillez sélectionner un mois.", "warning"); return; }
+
+        showSpinner();
+        try {
+          const js = await fetchJSON(`api/monthly_report.php?month=${monthStr}`);
+
+          document.getElementById('reportTitle').textContent = `Rapport Mensuel : ${js.meta.month_label}`;
+          document.getElementById('reportTotalProducts').textContent = js.data.total_products_shot;
+          document.getElementById('reportTotalViews').textContent = js.data.total_views_shot;
+
+          // Performance Délais
+          document.getElementById('reportOnTime').textContent = js.data.on_time_percentage + '%';
+          document.getElementById('reportLate').textContent = js.data.late_count;
+          document.getElementById('reportAvgDelay').textContent = js.data.avg_delay_days + ' j';
+
+          // Tableaux
+          const fillTable = (id, data, cols) => {
+            document.getElementById(id).innerHTML = data.map(row => `<tr>${cols.map(c => `<td>${row[c]}</td>`).join('')}
+        </tr>`).join('');
+          };
+
+          fillTable('reportPerfBody', js.data.photographer_performance, ['identifiant', 'products_count', 'views_count']);
+          fillTable('reportByTypeBody', js.data.by_type_performance, ['demandeur', 'products_count', 'views_count']);
+
+          // Backlog
+          document.getElementById('reportTotalBacklog').textContent = js.data.backlog_status.reduce((acc, cur) => acc +
+            parseInt(cur.count), 0);
+          fillTable('reportBacklogBody', js.data.backlog_status, ['statut_echantillon', 'count']);
+
+          document.getElementById('reportResult').classList.remove('d-none');
+
+        } catch (e) {
+          showToast("Erreur rapport: " + e.message, 'danger');
+        } finally {
+          hideSpinner();
+        }
+      }
+
+      // --- GESTION UTILISATEURS ---
+      async function loadUsers() {
+        showSpinner();
+        try {
+          const js = await fetchJSON('api/users_manager.php?action=list');
+          const tbody = document.getElementById('usersTableBody');
+          tbody.innerHTML = js.users.map(u => `
+        <tr>
+            <td>${u.identifiant}</td>
+            <td>${u.email || '-'}</td>
+            <td><span class="badge bg-secondary">${u.role}</span></td>
+            <td>
+                <button class="btn btn-sm btn-outline-primary"
+                    onclick="openEditUser(${u.id}, '${u.identifiant}', '${u.email}', '${u.role}')"><i
+                        class="bi bi-pencil"></i></button>
+                <button class="btn btn-sm btn-outline-warning" onclick="openResetPassword(${u.id})"><i
+                        class="bi bi-key"></i></button>
+                <button class="btn btn-sm btn-outline-danger" onclick="deleteUser(${u.id})"><i
+                        class="bi bi-trash"></i></button>
+            </td>
+        </tr>
+        `).join('');
+        } catch (e) {
+          showToast("Erreur chargement utilisateurs: " + e.message, 'danger');
+        } finally {
+          hideSpinner();
+        }
+      }
+
+      // --- VUE PAR DEMANDEUR (DASHBOARD) ---
+      let requesterSortBy = 'deadline';
+      let requesterYearFilter = 'all';
+
+      function setRequesterYear(year) {
+        requesterYearFilter = year;
+        // Re-render without fetching data again
+        renderRequester(fullTabRows);
+      } // 'name', 'deadline', 'total'
+
+
+      function showByRequester() {
+        currentTab = 'requester';
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('btnByRequester').classList.add('active');
+
+        document.querySelectorAll('[id^="panel"]').forEach(p => p.classList.add('d-none'));
+        document.getElementById('panelRequesterView').classList.remove('d-none');
+
+        // On recharge les données pour avoir tout (shooté + non shooté)
+        loadData();
+      }
+
+      function setRequesterSort(sortBy) {
+        requesterSortBy = sortBy;
+        loadData();
+      }
+
+      async function addUser(e) {
+        e.preventDefault();
+        const identifiant = document.getElementById('addIdentifiant').value.trim();
+        const email = document.getElementById('addEmail').value.trim();
+        const role = document.getElementById('addRole').value;
+
+        showSpinner();
+        try {
+          const js = await fetchJSON('api/users_manager.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'add_user', identifiant, email, role })
+          });
+
+          document.getElementById('addUserForm').reset();
+          loadUsers();
+
+          const resultDiv = document.getElementById('tempPasswordResult');
+          resultDiv.textContent = `Utilisateur créé. Mot de passe temporaire : ${js.temp_password}`;
+          resultDiv.classList.remove('d-none');
+
+        } catch (e) {
+          showToast("Erreur création: " + e.message, 'danger');
+        } finally {
+          hideSpinner();
+        }
+      }
+
+      function openEditUser(id, ident, email, role) {
+        document.getElementById('editUserId').value = id;
+        document.getElementById('editIdentifiant').value = ident;
+        document.getElementById('editEmail').value = email === 'null' ? '' : email;
+        document.getElementById('editRole').value = role;
+        editUserModal.show();
+      }
+
+      async function confirmEditUser() {
+        const id = document.getElementById('editUserId').value;
+        const identifiant = document.getElementById('editIdentifiant').value.trim();
+        const email = document.getElementById('editEmail').value.trim();
+        const role = document.getElementById('editRole').value;
+
+        showSpinner();
+        try {
+          await fetchJSON('api/users_manager.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'update_user', id, identifiant, email, role })
+          });
+          editUserModal.hide();
+          showToast("Utilisateur modifié.", "success");
+          loadUsers();
+        } catch (e) {
+          showToast("Erreur modification: " + e.message, 'danger');
+        } finally {
+          hideSpinner();
+        }
+      }
+
+      async function deleteUser(id) {
+        if (!confirm("Supprimer cet utilisateur ?")) return;
+        showSpinner();
+        try {
+          await fetchJSON('api/users_manager.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'delete_user', id })
+          });
+          showToast("Utilisateur supprimé.", "success");
+          loadUsers();
+        } catch (e) {
+          showToast("Erreur suppression: " + e.message, 'danger');
+        } finally {
+          hideSpinner();
+        }
+      }
+
+      function openResetPassword(id) {
+        document.getElementById('resetPasswordId').value = id;
+        resetPasswordModal.show();
+      }
+
+      async function confirmResetPassword() {
+        const id = document.getElementById('resetPasswordId').value;
+        showSpinner();
+        try {
+          const js = await fetchJSON('api/users_manager.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'reset_password', id })
+          });
+          resetPasswordModal.hide();
+
+          const resultDiv = document.getElementById('tempPasswordResult');
+          resultDiv.textContent = `Mot de passe réinitialisé : ${js.temp_password}`;
+          resultDiv.classList.remove('d-none');
+          window.scrollTo(0, 0);
+
+        } catch (e) {
+          showToast("Erreur réinitialisation: " + e.message, 'danger');
+        } finally {
+          hideSpinner();
+        }
+      }
+
+      // --- CHANGE PASSWORD (USER) ---
+      function openChangePasswordModal() {
+        document.getElementById('newPassword').value = '';
+        document.getElementById('changePasswordError').textContent = '';
+        changePasswordModal.show();
+      }
+
+      async function confirmChangePassword() {
+        const newPass = document.getElementById('newPassword').value.trim();
+        if (newPass.length < 8) {
+          document.getElementById('changePasswordError').textContent = "Le mot de passe doit faire au moins 8 caractères."
+            ; return;
+        } showSpinner(); try {
+          await fetchJSON('api/account.php', {
+            method: 'POST', headers:
+              { 'Content-Type': 'application/json' }, body: JSON.stringify({
+                action: 'change_password', new_password:
+                  newPass
+              })
+          }); changePasswordModal.hide(); showToast("Mot de passe modifié avec succès.", "success");
+          document.getElementById('changePasswordMessage').classList.add('d-none');
+        } catch (e) {
+          document.getElementById('changePasswordError').textContent = e.message;
+        } finally { hideSpinner(); }
+      } // ---
+      async function editLine(id) {
+        const row = lastRows.find(r => r.id == id);
+        if (!row) return;
+
+        // Populate the edit modal
+        document.getElementById('editProductId').value = row.id;
+        document.getElementById('editCode').value = row.code_produit || '';
+        document.getElementById('editDesignation').value = row.designation || '';
+        document.getElementById('editDemandeur').value = row.demandeur || '';
+        document.getElementById('editDemande').value = row.demande || '';
+        document.getElementById('editStatut').value = row.statut_echantillon || '';
+        document.getElementById('editDeadline').value = row.deadline || '';
+
+        document.getElementById('editRelanceComment').value = row.relance_comment || '';
+        // toggleRelanceComment(); // Plus besoin de toggle, toujours visible
+
+        editProductModal.show();
+      }
+
+      /*
+      function toggleRelanceComment() {
+        const status = document.getElementById('editStatut').value;
+        const container = document.getElementById('editRelanceCommentContainer');
+        if (status === 'Relancé') {
+          container.classList.remove('d-none');
+        } else {
+          container.classList.add('d-none');
+        }
+      }
+      */
+
+      async function confirmEditProduct() {
+        const id = document.getElementById('editProductId').value;
+        const payload = {
+          id: parseInt(id),
+          code_produit: document.getElementById('editCode').value.trim(),
+          designation: document.getElementById('editDesignation').value.trim(),
+          demandeur: document.getElementById('editDemandeur').value.trim(),
+          demande: document.getElementById('editDemande').value.trim(),
+          statut_echantillon: document.getElementById('editStatut').value,
+          deadline: document.getElementById('editDeadline').value || null,
+          relance_comment: document.getElementById('editRelanceComment').value.trim()
+        };
+
+        showSpinner();
+        try {
+          await fetchJSON('api/update_product.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          editProductModal.hide();
+          showToast('Produit mis à jour avec succès.', 'success');
+          await loadData();
+        } catch (e) {
+          showToast('Erreur: ' + e.message, 'danger');
+        } finally {
+          hideSpinner();
+        }
+      }
+
+      async function delLine(id) {
+        if (!confirm("Supprimer cette ligne ?")) return;
+        showSpinner();
+        try {
+          await fetchJSON('api/delete_product.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) });
+          showToast('Ligne supprimée.', 'success');
+          await loadData();
+        } catch (e) {
+          showToast('Erreur: ' + e.message, 'danger');
+        } finally {
+          hideSpinner();
+        }
+      }
+
+      // --- FILTER MODAL FUNCTIONS ---
+      function openFiltersModal(tab) {
+        // Populate filter lists based on current tab
+        const columns = ['demandeur', 'demande', 'statut_echantillon'];
+        if (tab === 'ok') {
+          columns.push('photographe_identifiant');
+          document.getElementById('filterSection_photographe').classList.remove('d-none');
+        } else {
+          document.getElementById('filterSection_photographe').classList.add('d-none');
+        }
+
+        columns.forEach(col => {
+          const container = document.getElementById(`filterList_${col}`);
+          if (!container) return;
+
+          const values = uniqueValues[col] || [];
+          let html = '';
+
+          values.forEach(val => {
+            const isChecked = activeFilters[col].has(val);
+            const safeVal = (val || '').replace(/'/g, "\\'");
+            html += `
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" value="${safeVal}" id="filter_${col}_${safeVal}" ${isChecked ? 'checked' : ''}>
+              <label class="form-check-label" for="filter_${col}_${safeVal}">
+                ${val || '(Vide)'}
+              </label>
+            </div>`;
+          });
+
+          container.innerHTML = html || '<p class="text-muted small">Aucune valeur disponible</p>';
+        });
+
+        filtersModal.show();
+      }
+
+      function applyFilters() {
+        // Collect checked values from modal
+        const columns = ['demandeur', 'demande', 'statut_echantillon', 'photographe_identifiant'];
+
+        columns.forEach(col => {
+          const container = document.getElementById(`filterList_${col}`);
+          if (!container) return;
+
+          activeFilters[col].clear();
+          const checkboxes = container.querySelectorAll('input[type="checkbox"]:checked');
+          checkboxes.forEach(cb => {
+            activeFilters[col].add(cb.value);
+          });
+
+          // Update filter icon
+          const icon = document.getElementById(`filterIcon_${col}`);
+          if (icon) {
+            if (activeFilters[col].size > 0) {
+              icon.classList.add('active-filter');
+            } else {
+              icon.classList.remove('active-filter');
+            }
+          }
+        });
+
+        // Update badge count
+        updateFilterBadge();
+
+        // Apply filters to current view
+        applySearch();
+
+        filtersModal.hide();
+        showToast('Filtres appliqués', 'success');
+      }
+
+      function resetFilters() {
+        // Clear all filters
+        Object.keys(activeFilters).forEach(col => {
+          activeFilters[col].clear();
+          const icon = document.getElementById(`filterIcon_${col}`);
+          if (icon) icon.classList.remove('active-filter');
+        });
+
+        // Uncheck all checkboxes in modal
+        document.querySelectorAll('#modalFilters input[type="checkbox"]').forEach(cb => {
+          cb.checked = false;
+        });
+
+        // Update badge
+        updateFilterBadge();
+
+        // Refresh view
+        applySearch();
+
+        showToast('Filtres réinitialisés', 'info');
+      }
+
+      function updateFilterBadge() {
+        let totalFilters = 0;
+        Object.values(activeFilters).forEach(filterSet => {
+          totalFilters += filterSet.size;
+        });
+
+        // Update badges for both tabs
+        ['shooter', 'ok'].forEach(tab => {
+          const badge = document.getElementById(`filterBadge_${tab}`);
+          if (badge) {
+            if (totalFilters > 0) {
+              badge.textContent = totalFilters;
+              badge.classList.remove('d-none');
+            } else {
+              badge.classList.add('d-none');
+            }
+          }
+        });
+      }
+      // --- RESPONSIVE SIDEBAR ---
+      function toggleSidebar() {
+        document.querySelector('.sidebar').classList.toggle('show');
+      }
+    </script>
+</body>
+
+</html>
