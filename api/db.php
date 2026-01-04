@@ -5,9 +5,9 @@ function pdo_conn(): PDO {
 
   $host = 'dubarrf20.mysql.db';
   $port = 3306; // MAMP MySQL
-  $db   = 'dubarrf20';
-  $user = 'dubarrf20';
-  $pass = 'Djeieusjf45';
+  $db   = 'zzz';
+  $user = 'zzz';
+  $pass = 'zzz';
 
   $dsn = "mysql:host=$host;port=$port;dbname=$db;charset=utf8mb4";
   $opt = [
